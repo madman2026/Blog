@@ -58,6 +58,7 @@
             font-style: normal;
         }
     </style>
+    @livewireStyles()
     @vite([
         'resources/css/app.css',
         'resources/js/app.js',
@@ -115,11 +116,13 @@
             {{-- Navigation --}}
             <nav class="hidden items-center gap-1 lg:flex">
 
-                <flux:button
-                    variant="ghost"
-                    href="{{ route('user.profile' , auth('web')->id()) }}"
-                    wire:navigate
-                >
+                @auth()
+                    <flux:button
+                        variant="ghost"
+                        href="{{ route('user.profile' , auth('web')->id()) }}"
+                        wire:navigate
+                    >
+                @endauth
                     داشبورد
                 </flux:button>
 
@@ -168,9 +171,12 @@
         {{ $slot }}
 
     </main>
+    @livewireScripts()
     <x-toaster-hub />
+    
     @stack('scripts')
     @fluxScripts
+
 </body>
 
 </html>
