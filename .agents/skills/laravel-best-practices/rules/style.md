@@ -44,12 +44,12 @@ Strings — use `Str` and fluent `Str::of()` over raw PHP:
 // Incorrect
 $slug = strtolower(str_replace(' ', '-', $title));
 $short = substr($text, 0, 100) . '...';
-$class = substr(strrchr('App\Models\User', '\\'), 1);
+$class = substr(strrchr('Modules\User\Models\User', '\\'), 1);
 
 // Correct
 $slug = Str::slug($title);
 $short = Str::limit($text, 100);
-$class = class_basename('App\Models\User');
+$class = class_basename('Modules\User\Models\User');
 ```
 
 Fluent strings — chain operations for complex transformations:

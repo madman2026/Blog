@@ -13,10 +13,8 @@ new #[Layout("auth::components.layouts.master")] #[Title("Login")] class extends
 
     public function login()
     {
-        $this->form->authenticate();
+        $this->form->authenticate() ? $this->success(__('auth.successfully')) : $this->error(__('auth.failed'));
 
-        $this->success('login successfuly');
-
-        return 'safdsf';
+        $this->redirectRoute('home' , navigate: true);
     }
 };

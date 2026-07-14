@@ -18,16 +18,16 @@ class LoginForm extends Form
     #[Validate('boolean')]
     public bool $remember = false;
 
-    public function authenticate(): void
+    public function authenticate(): bool
     {
         $credentials = $this->validate();
         unset($credentials['remember']);
         if (! Auth::attempt($credentials, $this->remember)) {
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
+            $this->addError('email' , __('auth.failed'));
+           return false;
         }
-
+        return true;
+        
         session()->regenerate();
     }
 }

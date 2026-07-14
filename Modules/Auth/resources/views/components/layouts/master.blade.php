@@ -86,7 +86,7 @@
 
         <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
 
-            @auth()
+            @auth
             <a
                 href="{{ route('user.profile' , auth('web')->id()) }}"
                 wire:navigate
@@ -116,15 +116,16 @@
             {{-- Navigation --}}
             <nav class="hidden items-center gap-1 lg:flex">
 
-                @auth()
+                @auth
                     <flux:button
                         variant="ghost"
                         href="{{ route('user.profile' , auth('web')->id()) }}"
                         wire:navigate
                     >
+
+                        داشبورد
+                    </flux:button>
                 @endauth
-                    داشبورد
-                </flux:button>
 
                 <flux:button
                     variant="ghost"
@@ -149,16 +150,11 @@
 
             </nav>
 
-            {{-- Right Side --}}
-            <div class="flex items-center gap-2">
-
-                {{-- Dark Mode --}}
-
-                {{-- Notifications --}}
-
-                {{-- User Menu --}}
-
-            </div>
+            <flux:radio.group x-data variant="segmented" x-model="$flux.appearance">
+                <flux:radio value="light" icon="sun" />
+                <flux:radio value="dark" icon="moon" />
+                <flux:radio value="system" icon="computer-desktop" />
+            </flux:radio.group>
 
         </div>
 
