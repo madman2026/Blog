@@ -2,8 +2,10 @@
 
 namespace Modules\Auth\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class AuthServiceProvider extends ModuleServiceProvider
 {
@@ -36,11 +38,23 @@ class AuthServiceProvider extends ModuleServiceProvider
 
     /**
      * Define module schedules.
-     * 
-     * @param $schedule
+     *
+     * @param  $schedule
      */
     // protected function configureSchedules(Schedule $schedule): void
     // {
     //     $schedule->command('inspire')->hourly();
     // }
+
+    public function boot(): void
+    {
+        $this->loadViewsFrom(
+            module_path('Auth', 'resources/views'),
+            'auth'
+        );
+
+        Gate::define('update-post', function () {
+            return Auth::check();
+        });
+    }
 }

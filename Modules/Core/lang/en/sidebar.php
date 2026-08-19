@@ -2,41 +2,39 @@
 
 return [
 
-    'dashboard' => 'داشبورد',
+    'dashboard' => 'Dashboard',
 
-    'search' => 'جستجو',
+    'search' => 'Search',
 
-    'notifications' => 'اعلان‌ها',
+    'notifications' => 'Notifications',
 
-    'documents' => 'اسناد',
+    'documents' => 'Documents',
 
-    'calendar' => 'تقویم',
+    'calendar' => 'Calendar',
 
-    'projects' => 'پروژه‌ها',
+    'projects' => 'Projects',
 
-    'profile' => 'پروفایل',
+    'profile' => 'Profile',
 
-    'settings' => 'تنظیمات',
+    'settings' => 'Settings',
 
-    'help' => 'راهنما',
-
+    'help' => 'Help',
 
     'management' => [
 
-        'title' => 'مدیریت',
+        'title' => 'Management',
 
-        'users' => 'کاربران',
+        'users' => 'Users',
 
-        'roles' => 'مقام‌ها',
+        'roles' => 'Roles',
 
-        'permissions' => 'دسترسی‌ها',
+        'permissions' => 'Permissions',
 
     ],
 
-
     'actions' => [
 
-        'close' => 'بستن منو',
+        'close' => 'Close menu',
 
     ],
 

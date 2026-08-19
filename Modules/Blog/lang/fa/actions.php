@@ -2,40 +2,20 @@
 
 return [
 
-    'dashboard' => 'Dashboard',
+    'create' => 'ایجاد نوشته',
 
-    'search' => 'Search',
+    'edit' => 'ویرایش',
 
-    'notifications' => 'Notifications',
+    'delete' => 'حذف',
 
-    'documents' => 'Documents',
+    'save' => 'ذخیره',
 
-    'calendar' => 'Calendar',
+    'save_draft' => 'ذخیره پیش‌نویس',
 
-    'projects' => 'Projects',
+    'publish' => 'انتشار',
 
-    'profile' => 'Profile',
+    'unpublish' => 'لغو انتشار',
 
-    'settings' => 'Settings',
-
-    'help' => 'Help',
-
-    'management' => [
-
-        'title' => 'Management',
-
-        'users' => 'Users',
-
-        'roles' => 'Roles',
-
-        'permissions' => 'Permissions',
-
-    ],
-
-    'actions' => [
-
-        'close' => 'Close menu',
-
-    ],
+    'preview' => 'پیش‌نمایش',
 
 ];

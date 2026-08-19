@@ -8,11 +8,13 @@
     "nightwatch": false,
     "sail": false,
     "skills": [
+        "infer-conventions",
         "laravel-best-practices",
         "fluxui-development",
         "livewire-development",
         "pest-testing",
         "echo-development",
-        "tailwindcss-development"
+        "tailwindcss-development",
+        "laravel-attributes"
     ]
 }

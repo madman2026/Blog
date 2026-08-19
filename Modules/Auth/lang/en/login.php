@@ -9,4 +9,5 @@ return [
     'loading' => 'Signing in...',
     'no_account' => "Don't have an account?",
     'register' => 'Create account',
+    'action' => 'Sign in',
 ];

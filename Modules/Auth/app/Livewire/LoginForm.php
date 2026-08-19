@@ -3,7 +3,6 @@
 namespace Modules\Auth\Livewire;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -23,11 +22,13 @@ class LoginForm extends Form
         $credentials = $this->validate();
         unset($credentials['remember']);
         if (! Auth::attempt($credentials, $this->remember)) {
-            $this->addError('email' , __('auth.failed'));
-           return false;
+            $this->addError('email', __('auth.failed'));
+
+            return false;
         }
-        return true;
-        
         session()->regenerate();
+
+        return true;
+
     }
 }

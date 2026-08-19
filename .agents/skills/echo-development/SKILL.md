@@ -79,7 +79,7 @@ Define authorization in `routes/channels.php`:
 <!-- Channel Authorization -->
 ```php
 use App\Models\Order;
-use Modules\User\Models\User;
+use App\Models\User;
 
 Broadcast::channel('orders.{orderId}', function (User $user, int $orderId) {
     return $user->id === Order::findOrNew($orderId)->user_id;

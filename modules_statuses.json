@@ -1,5 +1,8 @@
 {
     "User": true,
     "Auth": true,
-    "Article": true
+    "Interaction": true,
+    "Core": true,
+    "Media": true,
+    "Blog": true
 }

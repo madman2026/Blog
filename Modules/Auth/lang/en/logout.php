@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'action' => 'خروج از حساب',
+    'action' => 'Sign out',
 ];

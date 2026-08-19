@@ -2,40 +2,20 @@
 
 return [
 
-    'dashboard' => 'Dashboard',
+    'title' => 'عنوان',
 
-    'search' => 'Search',
+    'slug' => 'نامک',
 
-    'notifications' => 'Notifications',
+    'summary' => 'خلاصه',
 
-    'documents' => 'Documents',
+    'body' => 'محتوا',
 
-    'calendar' => 'Calendar',
+    'image' => 'تصویر شاخص',
 
-    'projects' => 'Projects',
+    'categories' => 'دسته‌بندی‌ها',
 
-    'profile' => 'Profile',
+    'tags' => 'برچسب‌ها',
 
-    'settings' => 'Settings',
-
-    'help' => 'Help',
-
-    'management' => [
-
-        'title' => 'Management',
-
-        'users' => 'Users',
-
-        'roles' => 'Roles',
-
-        'permissions' => 'Permissions',
-
-    ],
-
-    'actions' => [
-
-        'close' => 'Close menu',
-
-    ],
+    'published' => 'وضعیت انتشار',
 
 ];

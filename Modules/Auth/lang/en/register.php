@@ -1,15 +1,17 @@
 <?php
 
 return [
-    'title' => 'ایجاد حساب کاربری',
+    'title' => 'Create an account',
 
-    'description' => 'برای ادامه، اطلاعات حساب کاربری خود را وارد کنید.',
+    'description' => 'For Continue , Import Your Account Information.',
 
-    'submit' => 'ایجاد حساب',
+    'submit' => 'Create Account',
 
-    'loading' => 'در حال ایجاد حساب...',
+    'loading' => 'Creating Account , Please Wait...',
 
-    'have_account' => 'حساب کاربری دارید؟',
+    'have_account' => 'Have an account ?',
 
-    'login' => 'وارد شوید',
+    'login' => 'Login',
+
+    'action' => 'Register',
 ];
