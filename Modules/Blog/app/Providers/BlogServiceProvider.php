@@ -30,6 +30,7 @@ class BlogServiceProvider extends ModuleServiceProvider
      * @var string[]
      */
     protected array $providers = [
+        ArticleServiceProvider::class,
         EventServiceProvider::class,
         RouteServiceProvider::class,
     ];
