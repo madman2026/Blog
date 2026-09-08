@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "blog-article-reader": {
+      "command": "C:\\PHP\\php.exe",
+      "args": [
+        "C:\\Users\\Naked-Street\\Documents\\Blog\\artisan",
+        "mcp:start",
+        "blog-article-reader"
+      ]
+    },
+    "blog-article-search": {
+      "command": "C:\\PHP\\php.exe",
+      "args": [
+        "C:\\Users\\Naked-Street\\Documents\\Blog\\artisan",
+        "mcp:start",
+        "blog-article-search"
+      ]
+    },
+    "blog-article-writer": {
+      "command": "C:\\PHP\\php.exe",
+      "args": [
+        "C:\\Users\\Naked-Street\\Documents\\Blog\\artisan",
+        "mcp:start",
+        "blog-article-writer"
+      ]
+    }
+  }
+}
