@@ -4,7 +4,4 @@ namespace Modules\Blog\Livewire;
 
 use Livewire\Form;
 
-class PostForm extends Form
-{
-    
-}
+class PostForm extends Form {}

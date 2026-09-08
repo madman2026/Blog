@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Blog\Http\Controllers\BlogController;
 
 Route::prefix('blog')
     ->name('blog.')
@@ -19,7 +18,6 @@ Route::prefix('blog')
         Route::livewire('/posts/{post}', 'blog::posts.show')
             ->name('posts.show');
 
-
         /*
         |--------------------------------------------------------------------------
         | Management
@@ -35,11 +33,9 @@ Route::prefix('blog')
                     ->middleware('permission:posts.view')
                     ->name('posts.index');
 
-
                 Route::livewire('/posts/create', 'blog::posts.post')
                     ->middleware('permission:posts.create')
                     ->name('posts.create');
-
 
                 Route::livewire('/posts/{post}/edit', 'blog::posts.post')
                     ->middleware('permission:posts.update')

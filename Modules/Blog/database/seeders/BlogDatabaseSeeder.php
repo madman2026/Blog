@@ -32,7 +32,6 @@ class BlogDatabaseSeeder extends Seeder
         app(PermissionRegistrar::class)
             ->forgetCachedPermissions();
 
-
         /*
         |--------------------------------------------------------------------------
         | Find super user
@@ -49,7 +48,6 @@ class BlogDatabaseSeeder extends Seeder
             );
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | Create roles & permissions
@@ -59,7 +57,6 @@ class BlogDatabaseSeeder extends Seeder
         $roles = $this->createRoles();
 
         $this->createPermissions($roles);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -71,7 +68,6 @@ class BlogDatabaseSeeder extends Seeder
             $roles->get('admin')
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Reset permission cache
@@ -81,7 +77,6 @@ class BlogDatabaseSeeder extends Seeder
         app(PermissionRegistrar::class)
             ->forgetCachedPermissions();
     }
-
 
     /**
      * Create blog roles.
@@ -110,14 +105,12 @@ class BlogDatabaseSeeder extends Seeder
         ]);
     }
 
-
     /**
      * Create blog permissions and assign them to roles.
      */
     private function createPermissions(Collection $roles): void
     {
         $guard = config('auth.defaults.guard', 'web');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -146,7 +139,6 @@ class BlogDatabaseSeeder extends Seeder
             ]
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Admin
@@ -161,7 +153,6 @@ class BlogDatabaseSeeder extends Seeder
             ->syncPermissions(
                 $permissions->values()
             );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -179,7 +170,6 @@ class BlogDatabaseSeeder extends Seeder
                 $permissions->get('posts.create'),
                 $permissions->get('posts.update'),
             ]);
-
 
         /*
         |--------------------------------------------------------------------------

@@ -7,5 +7,6 @@ use Livewire\Form;
 
 class UserProfileForm extends Form
 {
-    #[Validate()]
+    #[Validate('required|string')]
+    public string $username;
 }
