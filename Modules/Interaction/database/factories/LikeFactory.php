@@ -3,7 +3,9 @@
 namespace Modules\Interaction\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Blog\Models\Post;
 use Modules\Interaction\Models\Like;
+use Modules\User\Models\User;
 
 class LikeFactory extends Factory
 {
@@ -17,6 +19,10 @@ class LikeFactory extends Factory
      */
     public function definition(): array
     {
-        return [];
+        return [
+            'user_id' => User::factory(),
+            'likeable_type' => Post::class,
+            'likeable_id' => Post::factory(),
+        ];
     }
 }

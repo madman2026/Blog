@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Modules\User\Models\User;
 
 return new class extends Migration
 {
@@ -12,14 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', function (Blueprint $table): void {
             $table->id();
-            $table->foreignIdFor(User::class)->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('parent_id')->nullable()->constrained('comments')->cascadeOnDelete();
             $table->morphs('commentable');
             $table->text('body');
+            $table->string('status', 32)->default('pending')->index();
+            $table->foreignId('moderated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('moderated_at')->nullable();
+            $table->text('moderation_notes')->nullable();
             $table->softDeletes();
-            $table->ipAddress('ip_address');
             $table->timestamps();
+
+            $table->index(['commentable_type', 'commentable_id', 'status']);
         });
     }
 

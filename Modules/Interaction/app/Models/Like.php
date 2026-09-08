@@ -10,19 +10,19 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Modules\Interaction\Database\Factories\LikeFactory;
 use Modules\User\Models\User;
 
-#[Fillable('ip_address')]
+#[Fillable('user_id', 'likeable_type', 'likeable_id')]
 class Like extends Model
 {
     use HasFactory;
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function likeable(): MorphTo
     {
         return $this->morphTo();
-    }
-
-    public function liker(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 
     protected static function newFactory(): LikeFactory

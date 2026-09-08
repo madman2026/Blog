@@ -10,12 +10,17 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Modules\Interaction\Database\Factories\ViewFactory;
 use Modules\User\Models\User;
 
-#[Fillable('ip_address')]
+#[Fillable('user_id', 'viewable_type', 'viewable_id', 'visitor_hash', 'viewed_on')]
 class View extends Model
 {
     use HasFactory;
 
-    public function viewer(): BelongsTo
+    protected function casts(): array
+    {
+        return ['viewed_on' => 'date'];
+    }
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

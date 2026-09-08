@@ -3,7 +3,10 @@
 namespace Modules\Interaction\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Blog\Models\Post;
+use Modules\Interaction\Enums\CommentStatus;
 use Modules\Interaction\Models\Comment;
+use Modules\User\Models\User;
 
 class CommentFactory extends Factory
 {
@@ -17,6 +20,16 @@ class CommentFactory extends Factory
      */
     public function definition(): array
     {
-        return [];
+        return [
+            'user_id' => User::factory(),
+            'parent_id' => null,
+            'commentable_type' => Post::class,
+            'commentable_id' => Post::factory(),
+            'body' => fake()->paragraph(),
+            'status' => CommentStatus::Pending,
+            'moderated_by' => null,
+            'moderated_at' => null,
+            'moderation_notes' => null,
+        ];
     }
 }

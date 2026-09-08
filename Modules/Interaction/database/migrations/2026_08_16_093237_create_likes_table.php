@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Modules\User\Models\User;
 
 return new class extends Migration
 {
@@ -12,12 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('likes', function (Blueprint $table) {
+        Schema::create('likes', function (Blueprint $table): void {
             $table->id();
-            $table->ipAddress('ip_address');
-            $table->foreignIdFor(User::class)->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->morphs('likeable');
             $table->timestamps();
+
+            $table->unique(
+                ['user_id', 'likeable_type', 'likeable_id'],
+                'likes_user_likeable_unique',
+            );
         });
     }
 

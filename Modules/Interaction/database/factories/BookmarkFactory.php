@@ -3,7 +3,9 @@
 namespace Modules\Interaction\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Blog\Models\Post;
 use Modules\Interaction\Models\Bookmark;
+use Modules\User\Models\User;
 
 class BookmarkFactory extends Factory
 {
@@ -17,6 +19,10 @@ class BookmarkFactory extends Factory
      */
     public function definition(): array
     {
-        return [];
+        return [
+            'user_id' => User::factory(),
+            'bookmarkable_type' => Post::class,
+            'bookmarkable_id' => Post::factory(),
+        ];
     }
 }

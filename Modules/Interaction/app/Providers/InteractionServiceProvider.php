@@ -15,4 +15,10 @@ class InteractionServiceProvider extends ModuleServiceProvider
      * The lowercase version of the module name.
      */
     protected string $nameLower = 'interaction';
+
+    /** @var array<int, class-string> */
+    protected array $providers = [
+        EventServiceProvider::class,
+        RouteServiceProvider::class,
+    ];
 }

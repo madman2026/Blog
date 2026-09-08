@@ -1,0 +1,16 @@
+{
+    "name": "nwidart/interaction",
+    "description": "Blog interaction module",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Interaction\\": "app/",
+            "Modules\\Interaction\\Database\\Factories\\": "database/factories/",
+            "Modules\\Interaction\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Interaction\\Tests\\": "tests/"
+        }
+    }
+}

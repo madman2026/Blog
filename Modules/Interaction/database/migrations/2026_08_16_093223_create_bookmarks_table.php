@@ -3,8 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Modules\Blog\Models\Post;
-use Modules\User\Models\User;
 
 return new class extends Migration
 {
@@ -13,11 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bookmarks', function (Blueprint $table) {
+        Schema::create('bookmarks', function (Blueprint $table): void {
             $table->id();
-            $table->foreignIdFor(Post::class)->constrained('posts')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignIdFor(User::class)->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->morphs('bookmarkable');
             $table->timestamps();
+
+            $table->unique(
+                ['user_id', 'bookmarkable_type', 'bookmarkable_id'],
+                'bookmarks_user_bookmarkable_unique',
+            );
         });
     }
 
