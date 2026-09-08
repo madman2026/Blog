@@ -12,6 +12,19 @@ class TagResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->getKey(),
+            'translations' => $this->whenLoaded(
+                'translations',
+                fn () => $this->translations->map->only([
+                    'locale',
+                    'name',
+                    'slug',
+                ])->values(),
+            ),
+            'posts_count' => $this->whenCounted('posts'),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }

@@ -29,6 +29,7 @@ class CreateArticleTool extends Tool
             'body' => ['required', 'string'],
             'summary' => ['nullable', 'string'],
             'published' => ['nullable', 'boolean'],
+            'locale' => ['nullable', 'string', 'in:fa,en'],
         ]);
 
         $article = $createArticle->handle(new CreateArticleData(
@@ -36,6 +37,7 @@ class CreateArticleTool extends Tool
             body: $validated['body'],
             summary: $validated['summary'] ?? null,
             published: (bool) ($validated['published'] ?? false),
+            locale: $validated['locale'] ?? config('platform.default_locale'),
         ));
 
         return Response::structured(['article' => $article->toArray()]);
@@ -61,6 +63,10 @@ class CreateArticleTool extends Tool
             'published' => $schema->boolean()
                 ->default(false)
                 ->description('Whether to publish immediately. Defaults to false.'),
+            'locale' => $schema->string()
+                ->enum(['fa', 'en'])
+                ->default('fa')
+                ->description('The article language.'),
         ];
     }
 

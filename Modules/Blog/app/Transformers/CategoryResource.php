@@ -12,6 +12,23 @@ class CategoryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->getKey(),
+            'parent_id' => $this->parent_id,
+            'is_active' => $this->is_active,
+            'translations' => $this->whenLoaded(
+                'translations',
+                fn () => $this->translations->map->only([
+                    'locale',
+                    'name',
+                    'slug',
+                    'description',
+                ])->values(),
+            ),
+            'children_count' => $this->whenCounted('children'),
+            'posts_count' => $this->whenCounted('posts'),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }

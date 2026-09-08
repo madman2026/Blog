@@ -17,6 +17,9 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
-        return [];
+        return [
+            'parent_id' => null,
+            'is_active' => true,
+        ];
     }
 }

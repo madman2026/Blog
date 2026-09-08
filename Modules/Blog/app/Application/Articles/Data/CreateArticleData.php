@@ -9,5 +9,6 @@ final readonly class CreateArticleData
         public string $body,
         public ?string $summary,
         public bool $published,
+        public string $locale = 'fa',
     ) {}
 }

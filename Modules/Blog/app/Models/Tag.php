@@ -2,34 +2,30 @@
 
 namespace Modules\Blog\Models;
 
-use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Blog\Database\Factories\TagFactory;
 
-#[Fillable('name')]
+#[Fillable([])]
 class Tag extends Model
 {
-    use HasFactory , Sluggable;
+    use HasFactory;
 
-    public function Tagable(): MorphTo
+    public function translations(): HasMany
     {
-        return $this->morphTo();
+        return $this->hasMany(TagTranslation::class);
+    }
+
+    public function posts(): BelongsToMany
+    {
+        return $this->belongsToMany(Post::class);
     }
 
     protected static function newFactory(): TagFactory
     {
         return TagFactory::new();
-    }
-
-    public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => 'name',
-            ],
-        ];
     }
 }

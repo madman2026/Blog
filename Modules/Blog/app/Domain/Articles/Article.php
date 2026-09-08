@@ -6,6 +6,7 @@ final readonly class Article
 {
     public function __construct(
         public int $id,
+        public string $locale,
         public string $title,
         public string $slug,
         public ?string $summary,
@@ -18,6 +19,7 @@ final readonly class Article
     /**
      * @return array{
      *     id: int,
+     *     locale: string,
      *     title: string,
      *     slug: string,
      *     summary: string|null,
@@ -31,6 +33,7 @@ final readonly class Article
     {
         return [
             'id' => $this->id,
+            'locale' => $this->locale,
             'title' => $this->title,
             'slug' => $this->slug,
             'summary' => $this->summary,

@@ -11,6 +11,7 @@ final class ArticleSchema
     {
         return $schema->object([
             'id' => $schema->integer()->required(),
+            'locale' => $schema->string()->required(),
             'title' => $schema->string()->required(),
             'slug' => $schema->string()->required(),
             'summary' => $schema->string()->nullable(),

@@ -3,7 +3,10 @@
 namespace Modules\Blog\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Blog\Enums\PostStatus;
+use Modules\Blog\Enums\PostType;
 use Modules\Blog\Models\Post;
+use Modules\User\Models\User;
 
 class PostFactory extends Factory
 {
@@ -18,11 +21,22 @@ class PostFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->unique()->sentence(5),
-            'summary' => fake()->paragraph(),
-            'body' => fake()->paragraphs(5, true),
-            'image' => null,
-            'published' => fake()->boolean(),
+            'author_id' => User::factory(),
+            'type' => PostType::Article,
+            'status' => PostStatus::Draft,
+            'reviewed_by' => null,
+            'review_notes' => null,
+            'submitted_at' => null,
+            'reviewed_at' => null,
+            'published_at' => null,
         ];
+    }
+
+    public function published(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => PostStatus::Published,
+            'published_at' => now(),
+        ]);
     }
 }

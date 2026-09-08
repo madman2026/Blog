@@ -8,25 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', function (Blueprint $table): void {
             $table->id();
-
-            $table->string('title');
-
-            $table->string('slug')->unique();
-
-            $table->text('summary')->nullable();
-
-            $table->longText('body');
-
-            $table->string('image')->nullable();
-
-            $table
-                ->boolean('published')
-                ->default(false)
-                ->index();
-
+            $table->foreignId('author_id')->constrained('users')->restrictOnDelete();
+            $table->string('type', 32)->default('article')->index();
+            $table->string('status', 32)->default('draft')->index();
+            $table->foreignId('reviewed_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->text('review_notes')->nullable();
+            $table->timestamp('submitted_at')->nullable()->index();
+            $table->timestamp('reviewed_at')->nullable();
+            $table->timestamp('published_at')->nullable()->index();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->index(['status', 'published_at']);
+            $table->index(['author_id', 'status']);
         });
     }
 
