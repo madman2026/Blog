@@ -12,10 +12,10 @@ Route::prefix('blog')
         |--------------------------------------------------------------------------
         */
 
-        Route::livewire('/posts', 'blog::posts.list')
+        Route::livewire('/posts', 'blog::post.list')
             ->name('posts.index');
 
-        Route::livewire('/posts/{post}', 'blog::posts.show')
+        Route::livewire('/posts/{postTranslation}', 'blog::post.show')
             ->name('posts.show');
 
         /*
@@ -29,16 +29,15 @@ Route::prefix('blog')
             ->name('manage.')
             ->group(function () {
 
-                Route::livewire('/posts', 'blog::posts.index')
-                    ->middleware('permission:posts.view')
+                Route::livewire('/posts', 'blog::post.index')
+                    ->middleware('permission:posts.view-any')
                     ->name('posts.index');
 
-                Route::livewire('/posts/create', 'blog::posts.post')
+                Route::livewire('/posts/create', 'blog::post.post')
                     ->middleware('permission:posts.create')
                     ->name('posts.create');
 
-                Route::livewire('/posts/{post}/edit', 'blog::posts.post')
-                    ->middleware('permission:posts.update')
+                Route::livewire('/posts/{post}/edit', 'blog::post.post')
                     ->name('posts.edit');
 
             });

@@ -12,6 +12,13 @@
     >
 
     <meta name="color-scheme" content="light dark">
+    @auth<meta name="authenticated-user-id" content="{{ auth()->id() }}">@endauth
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
     <title>{{ $title ?? config('app.name') }}</title>
 
@@ -186,6 +193,8 @@
     {{ $slot }}
 </main>
 
+
+<x-toaster-hub />
 
 @livewireScripts
 @fluxScripts

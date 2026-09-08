@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 new class extends Component
@@ -10,551 +10,91 @@ new class extends Component
     #[Computed]
     public function unreadNotificationsCount(): int
     {
-        $user = auth()->user();
-
-        if (! $user) {
-            return 0;
-        }
-
-        return $user
-            ->notifications()
-            ->whereNull('read_at')
-            ->count();
+        return auth()->user()?->unreadNotifications()->count() ?? 0;
     }
 
-    #[Computed]
-    public function avatarUrl(): ?string
+    #[On('notification-received')]
+    public function refreshNotifications(): void
     {
-        $avatar = auth()->user()?->avatar;
-
-        if (! $avatar) {
-            return null;
-        }
-
-        if (Str::startsWith($avatar, [
-            'http://',
-            'https://',
-            '/',
-        ])) {
-            return $avatar;
-        }
-
-        return Storage::disk('public')->url($avatar);
+        unset($this->unreadNotificationsCount);
     }
 };
-
 ?>
 
-@php
-    $user = auth()->user();
-@endphp
+<header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/85">
+    <div class="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
+        <a href="{{ route('home') }}" wire:navigate class="group flex shrink-0 items-center gap-2.5">
+            <span class="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-600 text-sm font-black text-white shadow-lg shadow-indigo-500/20 transition group-hover:scale-105">
+                {{ Str::upper(Str::substr(config('app.name'), 0, 1)) }}
+            </span>
+            <span class="hidden text-base font-black tracking-tight text-slate-950 sm:block dark:text-white">{{ config('app.name') }}</span>
+        </a>
 
-
-<flux:header
-    container
-    class="
-        sticky
-        top-0
-        z-40
-
-        min-h-16
-
-        border-b
-        border-zinc-200/70
-
-        bg-white/80
-
-        shadow-xs
-        shadow-zinc-950/5
-
-        backdrop-blur-xl
-        supports-[backdrop-filter]:bg-white/70
-
-        dark:border-white/10
-        dark:bg-zinc-950/80
-        dark:shadow-black/10
-        dark:supports-[backdrop-filter]:bg-zinc-950/70
-    "
->
-
-    {{-- Mobile Sidebar Toggle --}}
-    @auth
-        <flux:sidebar.toggle
-            class="lg:hidden"
-            icon="bars-2"
-            inset="left"
-        />
-    @endauth
-
-
-    {{-- Brand --}}
-    <flux:brand
-        href="{{ route('home') }}"
-        name="{{ config('app.name') }}"
-        wire:navigate
-        class="shrink-0"
-    >
-        <x-slot
-            name="logo"
-            class="
-                flex
-                size-8
-                items-center
-                justify-center
-
-                rounded-lg
-
-                bg-indigo-600
-
-                text-sm
-                font-bold
-                text-white
-
-                shadow-sm
-                shadow-indigo-600/20
-            "
-        >
-            {{ Str::upper(Str::substr(config('app.name'), 0, 1)) }}
-        </x-slot>
-    </flux:brand>
-
-
-    {{-- Desktop Navigation --}}
-    <flux:navbar class="hidden lg:flex">
-
-        {{-- Home --}}
-        <flux:navbar.item
-            icon="home"
-            href="{{ route('home') }}"
-            :current="request()->routeIs('home')"
-            wire:navigate
-        >
-            {{ __('core::header.navigation.home') }}
-        </flux:navbar.item>
-
-
-        @auth
-
-            {{-- Dashboard --}}
-            <flux:navbar.item
-                icon="squares-2x2"
-                href="{{ route('dashboard.index') }}"
-                :current="request()->routeIs('dashboard.*')"
-                wire:navigate
-            >
-                {{ __('core::header.navigation.dashboard') }}
+        <nav class="ms-2 hidden items-center gap-1 md:flex" aria-label="{{ __('Main navigation') }}">
+            <flux:navbar.item href="{{ route('home') }}" :current="request()->routeIs('home')" wire:navigate>
+                {{ __('Home') }}
             </flux:navbar.item>
-
-
-            {{-- Notifications --}}
-            <flux:navbar.item
-                icon="bell"
-                href="{{ route('notifications.index') }}"
-                :current="request()->routeIs('notifications.*')"
-
-                :badge="
-                    $this->unreadNotificationsCount > 0
-                        ? (
-                            $this->unreadNotificationsCount > 99
-                                ? '99+'
-                                : $this->unreadNotificationsCount
-                        )
-                        : null
-                "
-
-                wire:navigate
-            >
-                {{ __('core::header.navigation.notifications') }}
+            <flux:navbar.item href="{{ route('blog.posts.index') }}" :current="request()->routeIs('blog.posts.*')" wire:navigate>
+                {{ __('Articles') }}
             </flux:navbar.item>
-
-
-            {{-- Documents --}}
-            @can('documents.view')
-
-                <flux:navbar.item
-                    icon="document-text"
-                    href="{{ route('documents.index') }}"
-                    :current="request()->routeIs('documents.*')"
-                    wire:navigate
-                >
-                    {{ __('core::header.navigation.documents') }}
+            @can('viewAny', \Modules\Blog\Models\Post::class)
+                <flux:navbar.item href="{{ route('blog.manage.posts.index') }}" :current="request()->routeIs('blog.manage.*')" wire:navigate>
+                    {{ __('Writer studio') }}
                 </flux:navbar.item>
-
             @endcan
+        </nav>
 
-
-            {{-- Calendar --}}
-            @can('calendar.view')
-
-                <flux:navbar.item
-                    icon="calendar-days"
-                    href="{{ route('calendar.index') }}"
-                    :current="request()->routeIs('calendar.*')"
-                    wire:navigate
-                >
-                    {{ __('core::header.navigation.calendar') }}
-                </flux:navbar.item>
-
-            @endcan
-
-
-            {{-- Projects --}}
-            @can('projects.view')
-
-                <flux:navbar.item
-                    icon="folder"
-                    href="{{ route('projects.index') }}"
-                    :current="request()->routeIs('projects.*')"
-                    wire:navigate
-                >
-                    {{ __('core::header.navigation.projects') }}
-                </flux:navbar.item>
-
-            @endcan
-
-
-            {{-- Management --}}
-            @canany([
-                'users.view',
-                'roles.view',
-                'permissions.view',
-            ])
-
-                <flux:separator
-                    vertical
-                    variant="subtle"
-                    class="my-2"
-                />
-
-
-                <flux:dropdown>
-
-                    <flux:navbar.item
-                        icon="shield-check"
-                        icon:trailing="chevron-down"
-                        :current="request()->routeIs('admin.*')"
-                    >
-                        {{ __('core::header.management.title') }}
-                    </flux:navbar.item>
-
-
-                    <flux:navmenu>
-
-                        {{-- Users --}}
-                        @can('users.view')
-
-                            <flux:navmenu.item
-                                icon="users"
-                                href="{{ route('admin.users.index') }}"
-                                wire:navigate
-                            >
-                                {{ __('core::header.management.users') }}
-                            </flux:navmenu.item>
-
-                        @endcan
-
-
-                        {{-- Roles --}}
-                        @can('roles.view')
-
-                            <flux:navmenu.item
-                                icon="identification"
-                                href="{{ route('admin.roles.index') }}"
-                                wire:navigate
-                            >
-                                {{ __('core::header.management.roles') }}
-                            </flux:navmenu.item>
-
-                        @endcan
-
-
-                        {{-- Permissions --}}
-                        @can('permissions.view')
-
-                            <flux:navmenu.item
-                                icon="key"
-                                href="{{ route('admin.permissions.index') }}"
-                                wire:navigate
-                            >
-                                {{ __('core::header.management.permissions') }}
-                            </flux:navmenu.item>
-
-                        @endcan
-
-                    </flux:navmenu>
-
-                </flux:dropdown>
-
-            @endcanany
-
-        @endauth
-
-    </flux:navbar>
-
-
-    <flux:spacer />
-
-
-    {{-- Header Actions --}}
-    <flux:navbar>
-
-        @auth
-
-            {{-- Search --}}
-            <flux:navbar.item
-                icon="magnifying-glass"
-                href="{{ route('search.index') }}"
-                :current="request()->routeIs('search.*')"
-                label="{{ __('core::header.actions.search') }}"
-                wire:navigate
-            />
-
-
-            {{-- Settings --}}
-            <flux:navbar.item
-                class="max-lg:hidden"
-
-                icon="cog-6-tooth"
-
-                href="{{ route('account.settings') }}"
-                :current="request()->routeIs('account.settings')"
-
-                label="{{ __('core::header.actions.settings') }}"
-
-                wire:navigate
-            />
-
-        @endauth
-
-
-        {{-- Help --}}
-        <flux:navbar.item
-            class="max-lg:hidden"
-
-            icon="question-mark-circle"
-
-            href="{{ route('help.index') }}"
-            :current="request()->routeIs('help.*')"
-
-            label="{{ __('core::header.actions.help') }}"
-
-            wire:navigate
-        />
-
-    </flux:navbar>
-
-
-    {{-- Authenticated Profile --}}
-    @auth
-
-        <div
-            x-data
-            class="ms-1"
-        >
-
-            <flux:dropdown
-                position="bottom"
-                align="end"
-            >
-
-                <flux:profile
-                    circle
-
-                    name="{{ $user->username }}"
-
-                    :avatar="$this->avatarUrl"
-
-                    avatar:name="{{ $user->username }}"
-                />
-
-
-                <flux:menu class="min-w-60">
-
-                    {{-- User Information --}}
-                    <div class="px-3 py-2.5">
-
-                        <div
-                            class="
-                                flex
-                                min-w-0
-                                items-center
-                                gap-3
-                            "
-                        >
-
-                            <div class="min-w-0 flex-1">
-
-                                <flux:heading
-                                    size="sm"
-                                    class="truncate"
-                                >
-                                    {{ $user->username }}
-                                </flux:heading>
-
-
-                                <flux:text
-                                    size="sm"
-                                    class="
-                                        mt-0.5
-                                        truncate
-                                        text-zinc-500
-                                    "
-                                >
-                                    {{ $user->email }}
-                                </flux:text>
-
-                            </div>
-
-
-                            @if($user->roles->isNotEmpty())
-
-                                <flux:badge
-                                    size="sm"
-                                    variant="pill"
-                                    color="indigo"
-                                >
-                                    {{ $user->roles->first()->name }}
-                                </flux:badge>
-
-                            @endif
-
-                        </div>
-
-                    </div>
-
-
-                    <flux:menu.separator />
-
-
-                    {{-- Profile --}}
-                    <flux:menu.item
-                        icon="user"
-                        href="{{ route('account.profile') }}"
-                        wire:navigate
-                    >
-                        {{ __('core::header.profile.profile') }}
-                    </flux:menu.item>
-
-
-                    {{-- Settings --}}
-                    <flux:menu.item
-                        icon="cog-6-tooth"
-                        href="{{ route('account.settings') }}"
-                        wire:navigate
-                    >
-                        {{ __('core::header.profile.settings') }}
-                    </flux:menu.item>
-
-
-                    {{-- Notifications --}}
-                    <flux:menu.item
-                        icon="bell"
-
-                        href="{{ route('notifications.index') }}"
-
-                        :suffix="
-                            $this->unreadNotificationsCount > 0
-                                ? (
-                                    $this->unreadNotificationsCount > 99
-                                        ? '99+'
-                                        : $this->unreadNotificationsCount
-                                )
-                                : null
-                        "
-
-                        wire:navigate
-                    >
-                        {{ __('core::header.profile.notifications') }}
-                    </flux:menu.item>
-
-
-                    {{-- Admin Panel --}}
-                    @canany([
-                        'users.view',
-                        'roles.view',
-                        'permissions.view',
-                    ])
-
-                        <flux:menu.separator />
-
-
-                        <flux:menu.item
-                            icon="shield-check"
-                            href="{{ route('admin.index') }}"
-                            wire:navigate
-                        >
-                            {{ __('core::header.profile.admin_panel') }}
-                        </flux:menu.item>
-
-                    @endcanany
-
-
-                    <flux:menu.separator />
-
-
-                    {{-- Logout --}}
-                    <flux:menu.item
-                        icon="arrow-right-start-on-rectangle"
-
-                        variant="danger"
-
-                        x-on:click="$refs.logoutForm.requestSubmit()"
-                    >
-                        {{ __('auth::logout.action') }}
-                    </flux:menu.item>
-
-                </flux:menu>
-
-            </flux:dropdown>
-
-
-            <form
-                x-ref="logoutForm"
-
-                method="POST"
-
-                action="{{ route('auth.logout') }}"
-
-                class="hidden"
-            >
+        <div class="ms-auto flex items-center gap-1.5">
+            <form method="POST" action="{{ route('locale.update', app()->getLocale() === 'fa' ? 'en' : 'fa') }}">
                 @csrf
+                <flux:button type="submit" variant="ghost" size="sm" class="font-mono uppercase">
+                    {{ app()->getLocale() === 'fa' ? 'EN' : 'FA' }}
+                </flux:button>
             </form>
 
-        </div>
-
-    @endauth
-
-
-    {{-- Guest Actions --}}
-    @guest
-
-        <div class="flex items-center gap-2">
-
             <flux:button
-                href="{{ route('auth.login') }}"
-
                 variant="ghost"
                 size="sm"
+                icon="moon"
+                aria-label="{{ __('Toggle color theme') }}"
+                x-data
+                x-on:click="document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light')"
+            />
 
-                wire:navigate
-            >
-                {{ __('auth::login.action') }}
-            </flux:button>
+            @auth
+                <flux:button href="{{ route('notifications.index') }}" variant="ghost" size="sm" icon="bell" wire:navigate>
+                    @if ($this->unreadNotificationsCount)
+                        <span class="ms-1 rounded-full bg-cyan-500 px-1.5 text-[10px] font-bold text-slate-950">{{ min($this->unreadNotificationsCount, 99) }}</span>
+                    @endif
+                </flux:button>
 
-
-            <flux:button
-                href="{{ route('auth.register') }}"
-
-                variant="primary"
-                size="sm"
-
-                wire:navigate
-            >
-                {{ __('auth::register.action') }}
-            </flux:button>
-
+                <flux:dropdown position="bottom" align="end">
+                    <flux:button variant="ghost" size="sm" icon:trailing="chevron-down">
+                        {{ auth()->user()->username }}
+                    </flux:button>
+                    <flux:menu>
+                        <flux:menu.item icon="user" href="{{ route('user.profile', auth()->user()) }}" wire:navigate>{{ __('Profile') }}</flux:menu.item>
+                        <flux:menu.item icon="cog-6-tooth" href="{{ route('user.settings') }}" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item icon="squares-2x2" href="{{ route('dashboard') }}" wire:navigate>{{ __('Dashboard') }}</flux:menu.item>
+                        <flux:menu.separator />
+                        <form method="POST" action="{{ route('auth.logout') }}">
+                            @csrf
+                            <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle">{{ __('Log out') }}</flux:menu.item>
+                        </form>
+                    </flux:menu>
+                </flux:dropdown>
+            @else
+                <flux:button href="{{ route('auth.login') }}" variant="ghost" size="sm" wire:navigate>{{ __('Log in') }}</flux:button>
+                <flux:button href="{{ route('auth.register') }}" variant="primary" size="sm" wire:navigate>{{ __('Join') }}</flux:button>
+            @endauth
         </div>
+    </div>
 
-    @endguest
-
-</flux:header>
+    <nav class="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 pb-2 md:hidden" aria-label="{{ __('Mobile navigation') }}">
+        <flux:navbar.item href="{{ route('home') }}" :current="request()->routeIs('home')" wire:navigate>{{ __('Home') }}</flux:navbar.item>
+        <flux:navbar.item href="{{ route('blog.posts.index') }}" :current="request()->routeIs('blog.posts.*')" wire:navigate>{{ __('Articles') }}</flux:navbar.item>
+        @can('viewAny', \Modules\Blog\Models\Post::class)
+            <flux:navbar.item href="{{ route('blog.manage.posts.index') }}" wire:navigate>{{ __('Studio') }}</flux:navbar.item>
+        @endcan
+    </nav>
+</header>
