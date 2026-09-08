@@ -14,6 +14,8 @@
     "skills": [
         "infer-conventions",
         "laravel-best-practices",
+        "configuring-horizon",
+        "scout-development",
         "fluxui-development",
         "livewire-development",
         "pest-testing",
