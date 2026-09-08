@@ -13,8 +13,12 @@ new #[Title('Login')] class extends Component
 
     public function login(): void
     {
-        $this->form->authenticate() ? $this->success(__('auth.successfully')) : $this->error(__('auth.failed'));
-
-        $this->redirectRoute('home', navigate: true);
+        if ($this->form->authenticate())
+        {
+            $this->success(__('auth.successfully'));
+            $this->redirectRoute('home', navigate: true);
+        }else{
+            $this->error(__('auth.failed'));
+        }
     }
 };

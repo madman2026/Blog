@@ -152,6 +152,28 @@
             </flux:field>
 
 
+            {{-- Phone --}}
+            <flux:field>
+
+                <flux:label>
+                    {{ __('Phone number') }}
+                </flux:label>
+
+                <flux:input
+                    wire:model.blur="form.phone"
+                    type="tel"
+                    inputmode="tel"
+                    dir="ltr"
+                    autocomplete="tel"
+                    placeholder="+989121234567"
+                    icon="phone"
+                />
+
+                <flux:error name="form.phone" />
+
+            </flux:field>
+
+
             {{-- Password --}}
             <flux:field>
 

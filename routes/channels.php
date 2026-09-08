@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use Modules\User\Models\User;
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
-});
+Broadcast::channel(
+    'users.{id}',
+    fn (User $user, int $id): bool => $user->getKey() === $id,
+);

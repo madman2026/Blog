@@ -2,22 +2,29 @@
 
 namespace Modules\User\Livewire;
 
-use Illuminate\Support\Facades\Hash;
-use Livewire\Attributes\Validate;
+use Illuminate\Validation\Rules\Password;
 use Livewire\Form;
 
 class ChangePasswordForm extends Form
 {
-    #[Validate('required|string|min:6|confirmed')]
-    public string $password;
+    public string $currentPassword = '';
 
-    public string $password_confirmation;
+    public string $password = '';
 
-    public function store()
+    public string $passwordConfirmation = '';
+
+    public function store(): void
     {
-        $this->validate();
-        $user = auth('web')->user();
-        $user->password = Hash::make($this->password);
-        $user->save();
+        $validated = $this->validate([
+            'currentPassword' => ['required', 'current_password:web'],
+            'password' => ['required', 'confirmed:passwordConfirmation', Password::defaults()],
+            'passwordConfirmation' => ['required', 'string'],
+        ]);
+
+        $user = auth()->user();
+        $user->update(['password' => $validated['password']]);
+        $user->tokens()->delete();
+
+        $this->reset();
     }
 }

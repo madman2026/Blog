@@ -98,33 +98,32 @@
             class="space-y-5"
         >
 
-            {{-- Email --}}
+            {{-- Email or phone --}}
             <flux:field>
 
                 <flux:label>
-                    {{ __('auth::fields.email') }}
+                    {{ __('Email or phone') }}
                 </flux:label>
 
 
                 <flux:input
-                    wire:model.blur="form.email"
+                    wire:model.blur="form.identifier"
 
-                    type="email"
-                    inputmode="email"
+                    type="text"
 
                     dir="ltr"
 
-                    autocomplete="email"
+                    autocomplete="username"
                     autocapitalize="none"
                     spellcheck="false"
 
-                    placeholder="{{ __('auth::placeholders.email') }}"
+                    placeholder="name@example.com / +98912..."
 
                     icon="envelope"
                 />
 
 
-                <flux:error name="form.email" />
+                <flux:error name="form.identifier" />
 
             </flux:field>
 

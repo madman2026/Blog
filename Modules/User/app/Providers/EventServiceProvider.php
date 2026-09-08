@@ -3,6 +3,10 @@
 namespace Modules\User\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Modules\User\Events\AuthorApplicationReviewed;
+use Modules\User\Events\AuthorApplicationSubmitted;
+use Modules\User\Listeners\NotifyAdminsOfAuthorApplication;
+use Modules\User\Listeners\NotifyApplicantOfReview;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -11,14 +15,10 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
-
-    /**
-     * Indicates if events should be discovered.
-     *
-     * @var bool
-     */
-    protected static $shouldDiscoverEvents = true;
+    protected $listen = [
+        AuthorApplicationSubmitted::class => [NotifyAdminsOfAuthorApplication::class],
+        AuthorApplicationReviewed::class => [NotifyApplicantOfReview::class],
+    ];
 
     /**
      * Configure the proper event listeners for email verification.

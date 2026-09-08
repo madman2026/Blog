@@ -3,8 +3,6 @@
 namespace Modules\Auth\Providers;
 
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class AuthServiceProvider extends ModuleServiceProvider
@@ -48,13 +46,6 @@ class AuthServiceProvider extends ModuleServiceProvider
 
     public function boot(): void
     {
-        $this->loadViewsFrom(
-            module_path('Auth', 'resources/views'),
-            'auth'
-        );
-
-        Gate::define('update-post', function () {
-            return Auth::check();
-        });
+        parent::boot();
     }
 }

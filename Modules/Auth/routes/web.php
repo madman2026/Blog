@@ -9,3 +9,7 @@ Route::as('auth.')->prefix('auth')->group(function () {
     Route::post('logout', LogoutController::class)->middleware('auth')->name('logout');
     Route::livewire('forget-password', 'auth::pages.forget-password')->middleware('guest')->name('forget-password');
 });
+
+Route::livewire('auth/reset-password/{token}', 'auth::pages.reset-password')
+    ->middleware('guest')
+    ->name('password.reset');
