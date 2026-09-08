@@ -8,42 +8,58 @@ use App\Mcp\Tools\ReadArticleTool;
 use App\Mcp\Tools\SearchArticlesTool;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Models\PostTranslation;
+use Modules\User\Database\Seeders\RolesAndPermissionsSeeder;
+use Modules\User\Enums\UserRole;
+use Modules\User\Models\User;
 
 uses(LazilyRefreshDatabase::class);
+
+beforeEach(function (): void {
+    $this->seed(RolesAndPermissionsSeeder::class);
+
+    User::factory()->create([
+        'email' => config('platform.super_user.email'),
+    ])->assignRole(UserRole::SuperUser->value);
+});
 
 test('it creates a draft article through the writer server', function () {
     CreateArticleServer::tool(CreateArticleTool::class, [
         'title' => 'A practical MCP article',
         'body' => 'This article explains how local MCP tools work.',
         'summary' => 'An MCP introduction.',
+        'locale' => 'en',
     ])
         ->assertOk()
         ->assertStructuredContent(fn ($json) => $json
             ->where('article.title', 'A practical MCP article')
             ->where('article.slug', 'a-practical-mcp-article')
+            ->where('article.locale', 'en')
             ->where('article.published', false)
             ->etc());
 
-    $this->assertDatabaseHas('posts', [
-        'title' => 'A practical MCP article',
-        'published' => false,
-    ]);
+    expect(Post::query()->whereHas(
+        'translations',
+        fn ($query) => $query->where('title', 'A practical MCP article'),
+    )->exists())->toBeTrue();
 });
 
 test('it reads an article by slug through the reader server', function () {
-    $post = Post::factory()->create([
+    $post = Post::factory()->published()->create();
+    $translation = PostTranslation::factory()->for($post)->create([
         'title' => 'Readable article',
         'slug' => 'readable-article',
-        'published' => true,
+        'locale' => 'en',
     ]);
 
     ReadArticlesServer::tool(ReadArticleTool::class, [
-        'identifier' => $post->slug,
+        'identifier' => $translation->slug,
     ])
         ->assertOk()
         ->assertStructuredContent(fn ($json) => $json
             ->where('article.id', $post->id)
             ->where('article.slug', 'readable-article')
+            ->where('article.locale', 'en')
             ->where('article.published', true)
             ->etc());
 });
@@ -57,20 +73,20 @@ test('it reports a missing article through the reader server', function () {
 });
 
 test('it searches articles and filters publication status', function () {
-    Post::factory()->create([
+    $published = Post::factory()->published()->create();
+    PostTranslation::factory()->for($published)->create([
         'title' => 'Laravel MCP published guide',
-        'published' => true,
     ]);
 
-    Post::factory()->create([
+    $private = Post::factory()->create();
+    PostTranslation::factory()->for($private)->create([
         'title' => 'Laravel MCP private notes',
-        'published' => false,
     ]);
 
-    Post::factory()->create([
+    $unrelated = Post::factory()->published()->create();
+    PostTranslation::factory()->for($unrelated)->create([
         'title' => 'Unrelated post',
         'body' => 'Nothing about the requested subject.',
-        'published' => true,
     ]);
 
     SearchArticlesServer::tool(SearchArticlesTool::class, [
