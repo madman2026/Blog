@@ -16,6 +16,7 @@
         "vite": "^8.1.4"
     },
     "dependencies": {
+        "ckeditor5": "^48.5.0",
         "fontaine": "^0.8.0"
     }
 }
