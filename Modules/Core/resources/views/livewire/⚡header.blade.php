@@ -38,7 +38,7 @@ new class extends Component
                 {{ __('Articles') }}
             </flux:navbar.item>
             @can('viewAny', \Modules\Blog\Models\Post::class)
-                <flux:navbar.item href="{{ route('blog.manage.posts.index') }}" :current="request()->routeIs('blog.manage.*')" wire:navigate>
+                <flux:navbar.item href="{{ route('writer.dashboard') }}" :current="request()->routeIs('writer.*') || request()->routeIs('blog.manage.*')" wire:navigate>
                     {{ __('Writer studio') }}
                 </flux:navbar.item>
             @endcan
@@ -76,6 +76,12 @@ new class extends Component
                         <flux:menu.item icon="user" href="{{ route('user.profile', auth()->user()) }}" wire:navigate>{{ __('Profile') }}</flux:menu.item>
                         <flux:menu.item icon="cog-6-tooth" href="{{ route('user.settings') }}" wire:navigate>{{ __('Settings') }}</flux:menu.item>
                         <flux:menu.item icon="squares-2x2" href="{{ route('dashboard') }}" wire:navigate>{{ __('Dashboard') }}</flux:menu.item>
+                        @can(\Modules\User\Enums\UserPermission::PostsViewAny->value)
+                            <flux:menu.item icon="pencil-square" href="{{ route('writer.dashboard') }}" wire:navigate>{{ __('Writer panel') }}</flux:menu.item>
+                        @endcan
+                        @can(\Modules\User\Enums\UserPermission::UsersViewAny->value)
+                            <flux:menu.item icon="shield-check" href="{{ route('admin.dashboard') }}" wire:navigate>{{ __('Admin panel') }}</flux:menu.item>
+                        @endcan
                         <flux:menu.separator />
                         <form method="POST" action="{{ route('auth.logout') }}">
                             @csrf
@@ -94,7 +100,10 @@ new class extends Component
         <flux:navbar.item href="{{ route('home') }}" :current="request()->routeIs('home')" wire:navigate>{{ __('Home') }}</flux:navbar.item>
         <flux:navbar.item href="{{ route('blog.posts.index') }}" :current="request()->routeIs('blog.posts.*')" wire:navigate>{{ __('Articles') }}</flux:navbar.item>
         @can('viewAny', \Modules\Blog\Models\Post::class)
-            <flux:navbar.item href="{{ route('blog.manage.posts.index') }}" wire:navigate>{{ __('Studio') }}</flux:navbar.item>
+            <flux:navbar.item href="{{ route('writer.dashboard') }}" :current="request()->routeIs('writer.*')" wire:navigate>{{ __('Studio') }}</flux:navbar.item>
+        @endcan
+        @can(\Modules\User\Enums\UserPermission::UsersViewAny->value)
+            <flux:navbar.item href="{{ route('admin.dashboard') }}" :current="request()->routeIs('admin.*')" wire:navigate>{{ __('Admin') }}</flux:navbar.item>
         @endcan
     </nav>
 </header>
