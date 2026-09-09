@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\ValidationException;
+use Modules\Blog\Actions\DeleteTag;
 use Modules\Blog\Actions\SaveTag;
 use Modules\Blog\Http\Requests\Api\V1\SaveTagRequest;
 use Modules\Blog\Models\Tag;
@@ -65,17 +65,11 @@ class TagController extends Controller
         return new TagResource($saveTag->handle($request->validated(), $tag));
     }
 
-    public function destroy(Tag $tag): JsonResponse
+    public function destroy(Tag $tag, DeleteTag $deleteTag): JsonResponse
     {
         Gate::authorize(UserPermission::TaxonomiesManage->value);
 
-        if ($tag->posts()->exists()) {
-            throw ValidationException::withMessages([
-                'tag' => __('A tag in use cannot be deleted.'),
-            ]);
-        }
-
-        $tag->delete();
+        $deleteTag->handle($tag);
 
         return response()->json([], Response::HTTP_NO_CONTENT);
     }

@@ -3,22 +3,15 @@
 namespace Modules\Interaction\Actions;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Interaction\Interfaces\Repositories\EngagementRepository;
 use Modules\User\Models\User;
 
-class ToggleBookmark
+final readonly class ToggleBookmark
 {
+    public function __construct(private EngagementRepository $engagements) {}
+
     public function handle(User $user, Model $bookmarkable): bool
     {
-        $bookmark = $bookmarkable->bookmarks()->whereBelongsTo($user)->first();
-
-        if ($bookmark) {
-            $bookmark->delete();
-
-            return false;
-        }
-
-        $bookmarkable->bookmarks()->create(['user_id' => $user->getKey()]);
-
-        return true;
+        return $this->engagements->toggleBookmark($user, $bookmarkable);
     }
 }

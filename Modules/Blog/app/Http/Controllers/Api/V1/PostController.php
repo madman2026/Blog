@@ -65,7 +65,11 @@ class PostController extends Controller
 
         Gate::authorize('view', $post);
 
-        defer(fn () => $recordView->handle($request, $post));
+        $user = $request->user();
+        $ipAddress = $request->ip();
+        $userAgent = $request->userAgent();
+
+        defer(fn () => $recordView->handle($post, $user, $ipAddress, $userAgent));
 
         return new PostResource($post);
     }

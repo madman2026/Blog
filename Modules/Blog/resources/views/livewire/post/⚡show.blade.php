@@ -28,7 +28,12 @@ new class extends Component
             ->firstOrFail();
 
         Gate::authorize('view', $this->post);
-        $recordView->handle(request(), $this->post);
+        $recordView->handle(
+            $this->post,
+            auth()->user(),
+            request()->ip(),
+            request()->userAgent(),
+        );
     }
 
     public function hydrate(): void

@@ -7,34 +7,27 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
+use Modules\Blog\Actions\DeletePost;
 use Modules\Blog\Actions\SavePost;
 use Modules\Blog\Application\Posts\Data\SavePostData;
 use Modules\Blog\Enums\PostType;
 use Modules\Blog\Http\Requests\Api\V1\SavePostRequest;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Queries\ManagedPosts;
 use Modules\Blog\Transformers\PostResource;
-use Modules\User\Enums\UserPermission;
 use Symfony\Component\HttpFoundation\Response;
 
 class ManagedPostController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request, ManagedPosts $managedPosts): AnonymousResourceCollection
     {
         Gate::authorize('viewAny', Post::class);
 
-        $posts = Post::query()
-            ->when(
-                ! $request->user()->can(UserPermission::PostsUpdateAny->value),
-                fn ($query) => $query->whereBelongsTo($request->user(), 'author'),
-            )
-            ->when(
-                $request->string('status')->isNotEmpty(),
-                fn ($query) => $query->where('status', $request->string('status')->toString()),
-            )
-            ->with(['author.skills', 'author.media', 'translations', 'categories.translations', 'tags.translations', 'media'])
-            ->withCount(['comments', 'likes', 'views'])
-            ->latest()
-            ->paginate(min($request->integer('per_page', 20), 100));
+        $posts = $managedPosts->paginate(
+            $request->user(),
+            $request->string('status')->toString(),
+            min($request->integer('per_page', 20), 100),
+        );
 
         return PostResource::collection($posts);
     }
@@ -71,10 +64,10 @@ class ManagedPostController extends Controller
         );
     }
 
-    public function destroy(Request $request, Post $managedPost): JsonResponse
+    public function destroy(Request $request, Post $managedPost, DeletePost $deletePost): JsonResponse
     {
         Gate::authorize('delete', $managedPost);
-        $managedPost->delete();
+        $deletePost->handle($managedPost);
 
         return response()->json([], Response::HTTP_NO_CONTENT);
     }

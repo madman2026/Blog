@@ -3,24 +3,28 @@
 namespace Modules\Interaction\Actions;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
+use Modules\Interaction\Interfaces\Repositories\EngagementRepository;
 use Modules\Interaction\Models\View;
+use Modules\Interaction\Services\VisitorFingerprint;
+use Modules\User\Models\User;
 
-class RecordView
+final readonly class RecordView
 {
-    public function handle(Request $request, Model $viewable): View
-    {
-        $identity = $request->user()?->getAuthIdentifier()
-            ?? implode('|', [$request->ip(), $request->userAgent()]);
+    public function __construct(
+        private VisitorFingerprint $fingerprint,
+        private EngagementRepository $engagements,
+    ) {}
 
-        $visitorHash = hash_hmac('sha256', (string) $identity, (string) config('app.key'));
-
-        return $viewable->views()->firstOrCreate(
-            [
-                'visitor_hash' => $visitorHash,
-                'viewed_on' => today(),
-            ],
-            ['user_id' => $request->user()?->getAuthIdentifier()],
+    public function handle(
+        Model $viewable,
+        ?User $user,
+        ?string $ipAddress,
+        ?string $userAgent,
+    ): View {
+        return $this->engagements->recordView(
+            $viewable,
+            $this->fingerprint->make($user?->getKey(), $ipAddress, $userAgent),
+            $user?->getKey(),
         );
     }
 }

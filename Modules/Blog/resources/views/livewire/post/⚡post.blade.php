@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Masmerise\Toaster\Toastable;
 use Modules\Blog\Actions\SavePost;
+use Modules\Blog\Actions\SaveFeaturedImage;
 use Modules\Blog\Actions\SubmitPostForReview;
 use Modules\Blog\Application\Posts\Data\SavePostData;
 use Modules\Blog\Enums\PostType;
@@ -87,7 +88,7 @@ new class extends Component
         return Tag::query()->with('translations')->get();
     }
 
-    public function save(SavePost $savePost): void
+    public function save(SavePost $savePost, SaveFeaturedImage $saveFeaturedImage): void
     {
         $validated = $this->validate($this->rules());
 
@@ -119,17 +120,10 @@ new class extends Component
         );
 
         if ($this->featuredImage) {
-            $this->post
-                ->addMedia($this->featuredImage)
-                ->usingFileName($this->featuredImage->getClientOriginalName())
-                ->withCustomProperties(['alt' => $validated['imageAlt']])
-                ->withResponsiveImages()
-                ->toMediaCollection('featured_image');
+            $saveFeaturedImage->handle($this->post, $this->featuredImage, $validated['imageAlt']);
             $this->reset('featuredImage');
         } elseif ($this->post->hasMedia('featured_image')) {
-            $media = $this->post->getFirstMedia('featured_image');
-            $media?->setCustomProperty('alt', $validated['imageAlt']);
-            $media?->save();
+            $saveFeaturedImage->handle($this->post, null, $validated['imageAlt']);
         }
 
         $this->post->load(['translations', 'categories', 'tags', 'media']);
@@ -140,9 +134,13 @@ new class extends Component
         }
     }
 
-    public function submit(SavePost $savePost, SubmitPostForReview $submit): void
+    public function submit(
+        SavePost $savePost,
+        SaveFeaturedImage $saveFeaturedImage,
+        SubmitPostForReview $submit,
+    ): void
     {
-        $this->save($savePost);
+        $this->save($savePost, $saveFeaturedImage);
         Gate::authorize('submit', $this->post);
         $submit->handle($this->post);
         $this->success(__('Post submitted for editorial review.'));

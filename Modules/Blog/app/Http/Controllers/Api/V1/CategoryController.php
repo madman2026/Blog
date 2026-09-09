@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\ValidationException;
+use Modules\Blog\Actions\DeleteCategory;
 use Modules\Blog\Actions\SaveCategory;
 use Modules\Blog\Http\Requests\Api\V1\SaveCategoryRequest;
 use Modules\Blog\Models\Category;
@@ -66,17 +66,11 @@ class CategoryController extends Controller
         return new CategoryResource($saveCategory->handle($request->validated(), $category));
     }
 
-    public function destroy(Category $category): JsonResponse
+    public function destroy(Category $category, DeleteCategory $deleteCategory): JsonResponse
     {
         Gate::authorize(UserPermission::TaxonomiesManage->value);
 
-        if ($category->children()->exists() || $category->posts()->exists()) {
-            throw ValidationException::withMessages([
-                'category' => __('A category in use cannot be deleted.'),
-            ]);
-        }
-
-        $category->delete();
+        $deleteCategory->handle($category);
 
         return response()->json([], Response::HTTP_NO_CONTENT);
     }

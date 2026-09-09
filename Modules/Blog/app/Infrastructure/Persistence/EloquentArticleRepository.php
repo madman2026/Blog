@@ -4,10 +4,10 @@ namespace Modules\Blog\Infrastructure\Persistence;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use Modules\Blog\Application\Articles\Data\CreateArticleData;
-use Modules\Blog\Application\Articles\Data\SearchArticlesData;
 use Modules\Blog\Domain\Articles\Article;
+use Modules\Blog\Domain\Articles\ArticleDraft;
 use Modules\Blog\Domain\Articles\ArticleIdentifier;
+use Modules\Blog\Domain\Articles\ArticleSearchCriteria;
 use Modules\Blog\Domain\Articles\Contracts\ArticleRepository;
 use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Enums\PostType;
@@ -17,25 +17,25 @@ use Modules\User\Models\User;
 
 final class EloquentArticleRepository implements ArticleRepository
 {
-    public function create(CreateArticleData $data): Article
+    public function create(ArticleDraft $draft): Article
     {
         $author = User::query()
             ->where('email', config('platform.super_user.email'))
             ->firstOrFail();
 
-        $post = DB::transaction(function () use ($data, $author): Post {
+        $post = DB::transaction(function () use ($draft, $author): Post {
             $post = Post::query()->create([
                 'author_id' => $author->getKey(),
                 'type' => PostType::Article,
-                'status' => $data->published ? PostStatus::Published : PostStatus::Draft,
-                'published_at' => $data->published ? now() : null,
+                'status' => $draft->published ? PostStatus::Published : PostStatus::Draft,
+                'published_at' => $draft->published ? now() : null,
             ]);
 
             $post->translations()->create([
-                'locale' => $data->locale,
-                'title' => $data->title,
-                'body' => $data->body,
-                'summary' => $data->summary,
+                'locale' => $draft->locale,
+                'title' => $draft->title,
+                'body' => $draft->body,
+                'summary' => $draft->summary,
             ]);
 
             return $post->load('translations');
@@ -69,29 +69,29 @@ final class EloquentArticleRepository implements ArticleRepository
         return $translation ? $this->toDomain($post, $translation) : null;
     }
 
-    public function search(SearchArticlesData $data): array
+    public function search(ArticleSearchCriteria $criteria): array
     {
         return Post::query()
             ->with('translations')
-            ->whereHas('translations', function (Builder $query) use ($data): void {
-                $query->where(function (Builder $query) use ($data): void {
+            ->whereHas('translations', function (Builder $query) use ($criteria): void {
+                $query->where(function (Builder $query) use ($criteria): void {
                     $query
-                        ->where('title', 'like', "%{$data->query}%")
-                        ->orWhere('summary', 'like', "%{$data->query}%")
-                        ->orWhere('body', 'like', "%{$data->query}%")
-                        ->orWhere('slug', 'like', "%{$data->query}%");
+                        ->where('title', 'like', "%{$criteria->query}%")
+                        ->orWhere('summary', 'like', "%{$criteria->query}%")
+                        ->orWhere('body', 'like', "%{$criteria->query}%")
+                        ->orWhere('slug', 'like', "%{$criteria->query}%");
                 });
             })
             ->when(
-                $data->published === true,
+                $criteria->published === true,
                 fn (Builder $query): Builder => $query->published(),
             )
             ->when(
-                $data->published === false,
+                $criteria->published === false,
                 fn (Builder $query): Builder => $query->whereNot('status', PostStatus::Published),
             )
             ->latest()
-            ->limit($data->limit)
+            ->limit($criteria->limit)
             ->get()
             ->map(fn (Post $post): Article => $this->toDomain($post))
             ->values()

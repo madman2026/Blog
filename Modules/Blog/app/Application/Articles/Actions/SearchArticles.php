@@ -4,6 +4,7 @@ namespace Modules\Blog\Application\Articles\Actions;
 
 use Modules\Blog\Application\Articles\Data\SearchArticlesData;
 use Modules\Blog\Domain\Articles\Article;
+use Modules\Blog\Domain\Articles\ArticleSearchCriteria;
 use Modules\Blog\Domain\Articles\Contracts\ArticleRepository;
 
 final readonly class SearchArticles
@@ -13,6 +14,10 @@ final readonly class SearchArticles
     /** @return list<Article> */
     public function handle(SearchArticlesData $data): array
     {
-        return $this->articles->search($data);
+        return $this->articles->search(new ArticleSearchCriteria(
+            query: $data->query,
+            limit: $data->limit,
+            published: $data->published,
+        ));
     }
 }

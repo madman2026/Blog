@@ -3,22 +3,15 @@
 namespace Modules\Interaction\Actions;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Interaction\Interfaces\Repositories\EngagementRepository;
 use Modules\User\Models\User;
 
-class ToggleLike
+final readonly class ToggleLike
 {
+    public function __construct(private EngagementRepository $engagements) {}
+
     public function handle(User $user, Model $likeable): bool
     {
-        $like = $likeable->likes()->whereBelongsTo($user)->first();
-
-        if ($like) {
-            $like->delete();
-
-            return false;
-        }
-
-        $likeable->likes()->create(['user_id' => $user->getKey()]);
-
-        return true;
+        return $this->engagements->toggleLike($user, $likeable);
     }
 }

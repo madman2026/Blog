@@ -2,6 +2,10 @@
 
 namespace Modules\Interaction\Providers;
 
+use Modules\Interaction\Interfaces\Repositories\CommentRepository;
+use Modules\Interaction\Interfaces\Repositories\EngagementRepository;
+use Modules\Interaction\Repositories\EloquentCommentRepository;
+use Modules\Interaction\Repositories\EloquentEngagementRepository;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class InteractionServiceProvider extends ModuleServiceProvider
@@ -21,4 +25,12 @@ class InteractionServiceProvider extends ModuleServiceProvider
         EventServiceProvider::class,
         RouteServiceProvider::class,
     ];
+
+    public function register(): void
+    {
+        parent::register();
+
+        $this->app->bind(CommentRepository::class, EloquentCommentRepository::class);
+        $this->app->bind(EngagementRepository::class, EloquentEngagementRepository::class);
+    }
 }

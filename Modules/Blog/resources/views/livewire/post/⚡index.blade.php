@@ -9,15 +9,20 @@ use Livewire\WithPagination;
 use Masmerise\Toaster\Toastable;
 use Modules\Blog\Actions\ReviewPost;
 use Modules\Blog\Actions\SubmitPostForReview;
+use Modules\Blog\Actions\DeletePost;
 use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Enums\ReviewDecision;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Queries\FindPost;
+use Modules\Blog\Queries\ManagedPosts;
 use Modules\User\Enums\UserPermission;
 
 new class extends Component
 {
     use Toastable;
     use WithPagination;
+
+    protected ManagedPosts $managedPosts;
 
     #[Url]
     public string $status = '';
@@ -33,32 +38,29 @@ new class extends Component
         Gate::authorize('viewAny', Post::class);
     }
 
+    public function boot(ManagedPosts $managedPosts): void
+    {
+        $this->managedPosts = $managedPosts;
+    }
+
     #[Computed]
     public function posts(): LengthAwarePaginator
     {
-        return Post::query()
-            ->when(
-                ! auth()->user()->can(UserPermission::PostsUpdateAny->value),
-                fn ($query) => $query->whereBelongsTo(auth()->user(), 'author'),
-            )
-            ->when($this->status !== '', fn ($query) => $query->where('status', $this->status))
-            ->with(['translations', 'author.media', 'media'])
-            ->latest()
-            ->paginate(15);
+        return $this->managedPosts->paginate(auth()->user(), $this->status, 15);
     }
 
-    public function submit(int $postId, SubmitPostForReview $submit): void
+    public function submit(int $postId, FindPost $findPost, SubmitPostForReview $submit): void
     {
-        $post = Post::query()->findOrFail($postId);
+        $post = $findPost->byId($postId);
         Gate::authorize('submit', $post);
         $submit->handle($post);
         unset($this->posts);
         $this->success(__('Post submitted for editorial review.'));
     }
 
-    public function openReview(int $postId, string $decision): void
+    public function openReview(int $postId, string $decision, FindPost $findPost): void
     {
-        $post = Post::query()->findOrFail($postId);
+        $post = $findPost->byId($postId);
         Gate::authorize('review', $post);
 
         $this->reviewingPostId = $postId;
@@ -67,7 +69,7 @@ new class extends Component
         $this->modal('review-post')->show();
     }
 
-    public function review(ReviewPost $reviewPost): void
+    public function review(FindPost $findPost, ReviewPost $reviewPost): void
     {
         $validated = $this->validate([
             'reviewingPostId' => ['required', 'integer', 'exists:posts,id'],
@@ -79,7 +81,7 @@ new class extends Component
             ],
         ]);
 
-        $post = Post::query()->findOrFail($validated['reviewingPostId']);
+        $post = $findPost->byId($validated['reviewingPostId']);
         Gate::authorize('review', $post);
         $reviewPost->handle(
             $post,
@@ -94,11 +96,11 @@ new class extends Component
         $this->success(__('Editorial decision saved.'));
     }
 
-    public function delete(int $postId): void
+    public function delete(int $postId, FindPost $findPost, DeletePost $deletePost): void
     {
-        $post = Post::query()->findOrFail($postId);
+        $post = $findPost->byId($postId);
         Gate::authorize('delete', $post);
-        $post->delete();
+        $deletePost->handle($post);
         unset($this->posts);
         $this->success(__('Draft deleted.'));
     }
