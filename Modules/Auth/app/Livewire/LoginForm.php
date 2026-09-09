@@ -3,11 +3,10 @@
 namespace Modules\Auth\Livewire;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
-use Modules\User\Enums\UserStatus;
-use Modules\User\Models\User;
+use Modules\Auth\Actions\AuthenticateUser;
+use Modules\Auth\Data\LoginCredentials;
 
 class LoginForm extends Form
 {
@@ -20,27 +19,16 @@ class LoginForm extends Form
     #[Validate('boolean')]
     public bool $remember = false;
 
-    public function authenticate(): bool
+    public function authenticate(AuthenticateUser $authenticate): void
     {
         $validated = $this->validate();
-        $column = filter_var($validated['identifier'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
-        $user = User::query()->where($column, $validated['identifier'])->first();
-
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
-            $this->addError('identifier', __('auth.failed'));
-
-            return false;
-        }
-
-        if ($user->status === UserStatus::Suspended) {
-            $this->addError('identifier', __('This account is suspended.'));
-
-            return false;
-        }
+        $user = $authenticate->handle(new LoginCredentials(
+            identifier: $validated['identifier'],
+            password: $validated['password'],
+        ));
 
         Auth::login($user, $validated['remember']);
         session()->regenerate();
 
-        return true;
     }
 }

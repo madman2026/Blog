@@ -3,6 +3,10 @@
 namespace Modules\User\Providers;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Modules\User\Interfaces\Repositories\AuthorApplicationRepository;
+use Modules\User\Interfaces\Repositories\UserRepository;
+use Modules\User\Repositories\EloquentAuthorApplicationRepository;
+use Modules\User\Repositories\EloquentUserRepository;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class UserServiceProvider extends ModuleServiceProvider
@@ -33,6 +37,14 @@ class UserServiceProvider extends ModuleServiceProvider
         EventServiceProvider::class,
         RouteServiceProvider::class,
     ];
+
+    public function register(): void
+    {
+        parent::register();
+
+        $this->app->bind(UserRepository::class, EloquentUserRepository::class);
+        $this->app->bind(AuthorApplicationRepository::class, EloquentAuthorApplicationRepository::class);
+    }
 
     /**
      * Define module schedules.

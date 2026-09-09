@@ -2,11 +2,10 @@
 
 namespace Modules\Auth\Livewire;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Form;
-use Modules\User\Actions\IssuePhoneVerificationChallenge;
-use Modules\User\Enums\UserRole;
+use Modules\Auth\Actions\RegisterUser;
+use Modules\Auth\Data\RegisterUserData;
 use Modules\User\Models\User;
 
 class RegisterForm extends Form
@@ -21,27 +20,17 @@ class RegisterForm extends Form
 
     public string $password_confirmation = '';
 
-    public function store(): User
+    public function store(RegisterUser $register): User
     {
         $validated = $this->validate();
 
-        $user = DB::transaction(function () use ($validated): User {
-            $user = User::query()->create([
-                'email' => mb_strtolower($validated['email']),
-                'username' => $validated['username'],
-                'phone' => $validated['phone'],
-                'password' => $validated['password'],
-                'preferred_locale' => app()->getLocale(),
-            ]);
-            $user->assignRole(UserRole::User->value);
-
-            return $user;
-        });
-
-        $user->sendEmailVerificationNotification();
-        app(IssuePhoneVerificationChallenge::class)->handle($user);
-
-        return $user;
+        return $register->handle(new RegisterUserData(
+            username: $validated['username'],
+            email: $validated['email'],
+            phone: $validated['phone'],
+            password: $validated['password'],
+            preferredLocale: app()->getLocale(),
+        ));
     }
 
     /** @return array<string, array<int, mixed>> */

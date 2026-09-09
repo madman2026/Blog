@@ -4,6 +4,7 @@ namespace Modules\User\Livewire;
 
 use Illuminate\Validation\Rules\Password;
 use Livewire\Form;
+use Modules\User\Actions\UpdatePassword;
 
 class ChangePasswordForm extends Form
 {
@@ -13,7 +14,7 @@ class ChangePasswordForm extends Form
 
     public string $passwordConfirmation = '';
 
-    public function store(): void
+    public function store(UpdatePassword $updatePassword): void
     {
         $validated = $this->validate([
             'currentPassword' => ['required', 'current_password:web'],
@@ -21,9 +22,7 @@ class ChangePasswordForm extends Form
             'passwordConfirmation' => ['required', 'string'],
         ]);
 
-        $user = auth()->user();
-        $user->update(['password' => $validated['password']]);
-        $user->tokens()->delete();
+        $updatePassword->handle(auth()->user(), $validated['password']);
 
         $this->reset();
     }

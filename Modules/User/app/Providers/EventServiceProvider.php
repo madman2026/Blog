@@ -5,8 +5,12 @@ namespace Modules\User\Providers;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Modules\User\Events\AuthorApplicationReviewed;
 use Modules\User\Events\AuthorApplicationSubmitted;
+use Modules\User\Events\ManagedUserRoleChanged;
+use Modules\User\Events\ManagedUserStatusChanged;
 use Modules\User\Listeners\NotifyAdminsOfAuthorApplication;
 use Modules\User\Listeners\NotifyApplicantOfReview;
+use Modules\User\Listeners\NotifyUserOfRoleChange;
+use Modules\User\Listeners\NotifyUserOfStatusChange;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -18,6 +22,8 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         AuthorApplicationSubmitted::class => [NotifyAdminsOfAuthorApplication::class],
         AuthorApplicationReviewed::class => [NotifyApplicantOfReview::class],
+        ManagedUserRoleChanged::class => [NotifyUserOfRoleChange::class],
+        ManagedUserStatusChanged::class => [NotifyUserOfStatusChange::class],
     ];
 
     /**

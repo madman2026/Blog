@@ -14,31 +14,20 @@ use Modules\User\Enums\UserStatus;
 use Modules\User\Http\Requests\Api\V1\UpdateUserRolesRequest;
 use Modules\User\Http\Requests\Api\V1\UpdateUserStatusRequest;
 use Modules\User\Models\User;
+use Modules\User\Queries\ManagedUsers;
 use Modules\User\Transformers\UserResource;
 
 class ManagedUserController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request, ManagedUsers $managedUsers): AnonymousResourceCollection
     {
         Gate::authorize(UserPermission::UsersViewAny->value);
 
-        $users = User::query()
-            ->when(
-                $request->string('search')->isNotEmpty(),
-                fn ($query) => $query->where(function ($query) use ($request): void {
-                    $search = $request->string('search')->toString();
-                    $query->where('username', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%");
-                }),
-            )
-            ->when(
-                $request->string('status')->isNotEmpty(),
-                fn ($query) => $query->where('status', $request->string('status')->toString()),
-            )
-            ->with(['skills', 'media', 'roles'])
-            ->latest()
-            ->paginate(min($request->integer('per_page', 20), 100));
+        $users = $managedUsers->paginate(
+            $request->string('search')->toString(),
+            $request->string('status')->toString(),
+            min($request->integer('per_page', 20), 100),
+        );
 
         return UserResource::collection($users);
     }

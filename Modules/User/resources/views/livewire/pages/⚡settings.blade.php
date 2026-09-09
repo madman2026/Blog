@@ -1,16 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Masmerise\Toaster\Toastable;
 use Modules\User\Actions\ConfirmPhoneVerificationChallenge;
 use Modules\User\Actions\IssuePhoneVerificationChallenge;
 use Modules\User\Actions\SubmitAuthorApplication;
+use Modules\User\Actions\UpdateProfile;
+use Modules\User\Actions\UploadAvatar;
+use Modules\User\Data\UpdateProfileData;
 use Modules\User\Enums\AuthorApplicationStatus;
 use Modules\User\Enums\UserRole;
-use Modules\User\Models\Skill;
 
 new class extends Component
 {
@@ -45,7 +45,7 @@ new class extends Component
         $this->skills = $user->skills->pluck('name')->implode(', ');
     }
 
-    public function save(): void
+    public function save(UpdateProfile $updateProfile, UploadAvatar $uploadAvatar): void
     {
         $user = auth()->user();
         $usernameRules = ['required', 'string', 'max:32'];
@@ -71,32 +71,19 @@ new class extends Component
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096', 'dimensions:min_width=256,min_height=256,max_width=5000,max_height=5000'],
         ]);
 
-        DB::transaction(function () use ($user, $validated): void {
-            $user->update([
+        $user = $updateProfile->handle($user, new UpdateProfileData(
+            attributes: [
                 'username' => $validated['username'],
                 'bio' => filled($validated['bio']) ? $validated['bio'] : null,
                 'about' => filled($validated['about']) ? $validated['about'] : null,
                 'preferred_locale' => $validated['preferredLocale'],
-                'social_links' => collect($validated['socialLinks'])->filter()->all(),
-            ]);
-
-            $skillIds = collect(preg_split('/[,،]/u', $validated['skills']) ?: [])
-                ->map(fn (string $name): string => Str::squish($name))
-                ->filter()
-                ->unique(fn (string $name): string => mb_strtolower($name))
-                ->take(20)
-                ->map(function (string $name): int {
-                    $slug = Str::slug($name) ?: 'skill-'.hash('xxh3', mb_strtolower($name));
-
-                    return Skill::query()->firstOrCreate(['slug' => $slug], ['name' => $name])->getKey();
-                })
-                ->all();
-
-            $user->skills()->sync($skillIds);
-        });
+                'social_links' => $validated['socialLinks'],
+            ],
+            skills: preg_split('/[,،]/u', $validated['skills']) ?: [],
+        ));
 
         if ($this->avatar) {
-            $user->addMedia($this->avatar)->toMediaCollection('avatar');
+            $uploadAvatar->handle($user, $this->avatar);
             $this->reset('avatar');
         }
 

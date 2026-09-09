@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Masmerise\Toaster\Toastable;
+use Modules\User\Actions\UpdatePassword;
 use Modules\User\Livewire\ChangePasswordForm;
 
 new class extends Component
@@ -10,9 +11,9 @@ new class extends Component
 
     public ChangePasswordForm $form;
 
-    public function save(): void
+    public function save(UpdatePassword $updatePassword): void
     {
-        $this->form->store();
+        $this->form->store($updatePassword);
         $this->success(__('Password updated.'));
     }
 };

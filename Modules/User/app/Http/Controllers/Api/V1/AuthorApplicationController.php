@@ -8,22 +8,19 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
 use Modules\User\Actions\SubmitAuthorApplication;
 use Modules\User\Models\AuthorApplication;
+use Modules\User\Queries\AuthorApplications;
 use Modules\User\Transformers\AuthorApplicationResource;
 
 class AuthorApplicationController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request, AuthorApplications $authorApplications): AnonymousResourceCollection
     {
         Gate::authorize('viewAny', AuthorApplication::class);
 
-        $applications = AuthorApplication::query()
-            ->with(['user.skills', 'reviewer'])
-            ->when(
-                $request->string('status')->isNotEmpty(),
-                fn ($query) => $query->where('status', $request->string('status')->toString()),
-            )
-            ->latest()
-            ->paginate(min($request->integer('per_page', 20), 100));
+        $applications = $authorApplications->paginate(
+            $request->string('status')->toString(),
+            min($request->integer('per_page', 20), 100),
+        );
 
         return AuthorApplicationResource::collection($applications);
     }

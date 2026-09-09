@@ -3,6 +3,7 @@
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Masmerise\Toaster\Toastable;
+use Modules\Auth\Actions\AuthenticateUser;
 use Modules\Auth\Livewire\LoginForm;
 
 new #[Title('Login')] class extends Component
@@ -11,14 +12,10 @@ new #[Title('Login')] class extends Component
 
     public LoginForm $form;
 
-    public function login(): void
+    public function login(AuthenticateUser $authenticate): void
     {
-        if ($this->form->authenticate())
-        {
-            $this->success(__('auth.successfully'));
-            $this->redirectRoute('home', navigate: true);
-        }else{
-            $this->error(__('auth.failed'));
-        }
+        $this->form->authenticate($authenticate);
+        $this->success(__('auth.successfully'));
+        $this->redirectRoute('home', navigate: true);
     }
 };

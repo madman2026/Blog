@@ -3,14 +3,11 @@
 namespace Modules\Auth\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
+use Modules\Auth\Actions\CompletePasswordReset;
 use Modules\Auth\Http\Requests\Api\V1\ForgotPasswordRequest;
 use Modules\Auth\Http\Requests\Api\V1\ResetPasswordRequest;
-use Modules\User\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 
 class PasswordResetController extends Controller
@@ -24,25 +21,12 @@ class PasswordResetController extends Controller
         ], Response::HTTP_ACCEPTED);
     }
 
-    public function reset(ResetPasswordRequest $request): JsonResponse
+    public function reset(ResetPasswordRequest $request, CompletePasswordReset $completePasswordReset): JsonResponse
     {
-        $status = Password::reset(
+        $completePasswordReset->handle(
             $request->safe()->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user, string $password): void {
-                $user->forceFill([
-                    'password' => $password,
-                    'remember_token' => Str::random(60),
-                ])->save();
-                $user->tokens()->delete();
-
-                event(new PasswordReset($user));
-            },
         );
 
-        if ($status !== Password::PasswordReset) {
-            throw ValidationException::withMessages(['email' => __($status)]);
-        }
-
-        return response()->json(['message' => __($status)]);
+        return response()->json(['message' => __(Password::PasswordReset)]);
     }
 }

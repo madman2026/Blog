@@ -3,6 +3,8 @@
 namespace Modules\Auth\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Modules\Auth\Events\UserRegistered;
+use Modules\Auth\Listeners\SendRegistrationVerifications;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -11,14 +13,9 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
-
-    /**
-     * Indicates if events should be discovered.
-     *
-     * @var bool
-     */
-    protected static $shouldDiscoverEvents = true;
+    protected $listen = [
+        UserRegistered::class => [SendRegistrationVerifications::class],
+    ];
 
     /**
      * Configure the proper event listeners for email verification.

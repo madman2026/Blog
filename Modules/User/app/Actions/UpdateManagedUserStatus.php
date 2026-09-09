@@ -3,28 +3,32 @@
 namespace Modules\User\Actions;
 
 use Illuminate\Validation\ValidationException;
-use Modules\User\Enums\UserRole;
 use Modules\User\Enums\UserStatus;
+use Modules\User\Events\ManagedUserStatusChanged;
+use Modules\User\Interfaces\Repositories\UserRepository;
 use Modules\User\Models\User;
+use Modules\User\Services\ManagedUserPolicy;
 
-class UpdateManagedUserStatus
+final readonly class UpdateManagedUserStatus
 {
+    public function __construct(
+        private ManagedUserPolicy $policy,
+        private UserRepository $users,
+    ) {}
+
     public function handle(User $managedUser, User $actor, UserStatus $status): User
     {
-        if ($actor->is($managedUser)) {
+        if (! $this->policy->canManage($actor, $managedUser)) {
             throw ValidationException::withMessages(['status' => __('You cannot change the status of your own account.')]);
         }
 
-        if ($managedUser->hasRole(UserRole::SuperUser->value)) {
+        if (! $this->policy->canSuspend($managedUser)) {
             throw ValidationException::withMessages(['status' => __('A super-user account cannot be suspended.')]);
         }
 
-        $managedUser->update(['status' => $status]);
+        $managedUser = $this->users->updateStatus($managedUser, $status);
+        ManagedUserStatusChanged::dispatch($managedUser, $status);
 
-        if ($status === UserStatus::Suspended) {
-            $managedUser->tokens()->delete();
-        }
-
-        return $managedUser->refresh();
+        return $managedUser;
     }
 }

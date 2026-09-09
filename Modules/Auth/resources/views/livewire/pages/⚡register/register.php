@@ -4,15 +4,16 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\Component;
+use Modules\Auth\Actions\RegisterUser;
 use Modules\Auth\Livewire\RegisterForm;
 
 new class extends Component
 {
     public RegisterForm $form;
 
-    public function register(): void
+    public function register(RegisterUser $register): void
     {
-        $user = $this->form->store();
+        $user = $this->form->store($register);
         Auth::login($user);
         session()->regenerate();
 

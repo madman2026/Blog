@@ -7,6 +7,8 @@ use App\Http\Resources\NotificationResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Modules\User\Actions\MarkAllNotificationsRead;
+use Modules\User\Actions\MarkNotificationRead;
 use Symfony\Component\HttpFoundation\Response;
 
 class NotificationController extends Controller
@@ -22,17 +24,19 @@ class NotificationController extends Controller
         return NotificationResource::collection($notifications);
     }
 
-    public function markRead(Request $request, string $notification): NotificationResource
-    {
-        $notificationModel = $request->user()->notifications()->findOrFail($notification);
-        $notificationModel->markAsRead();
-
-        return new NotificationResource($notificationModel->refresh());
+    public function markRead(
+        Request $request,
+        string $notification,
+        MarkNotificationRead $markNotificationRead,
+    ): NotificationResource {
+        return new NotificationResource(
+            $markNotificationRead->handle($request->user(), $notification),
+        );
     }
 
-    public function markAllRead(Request $request): JsonResponse
+    public function markAllRead(Request $request, MarkAllNotificationsRead $markAllNotificationsRead): JsonResponse
     {
-        $request->user()->unreadNotifications()->update(['read_at' => now()]);
+        $markAllNotificationsRead->handle($request->user());
 
         return response()->json([], Response::HTTP_NO_CONTENT);
     }

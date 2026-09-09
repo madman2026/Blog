@@ -3,29 +3,28 @@
 namespace Modules\User\Actions;
 
 use Illuminate\Validation\ValidationException;
-use Modules\User\Enums\AuthorApplicationStatus;
-use Modules\User\Enums\UserRole;
 use Modules\User\Events\AuthorApplicationSubmitted;
+use Modules\User\Interfaces\Repositories\AuthorApplicationRepository;
 use Modules\User\Models\AuthorApplication;
 use Modules\User\Models\User;
+use Modules\User\Services\AuthorApplicationWorkflow;
 
-class SubmitAuthorApplication
+final readonly class SubmitAuthorApplication
 {
+    public function __construct(
+        private AuthorApplicationWorkflow $workflow,
+        private AuthorApplicationRepository $applications,
+    ) {}
+
     public function handle(User $user): AuthorApplication
     {
-        if ($user->hasRole(UserRole::Author->value)) {
+        if ($this->workflow->isAuthor($user)) {
             throw ValidationException::withMessages([
                 'application' => __('You are already an author.'),
             ]);
         }
 
-        $missing = collect([
-            'avatar' => $user->hasMedia('avatar'),
-            'bio' => $user->bio,
-            'about' => $user->about,
-            'social_links' => $user->social_links,
-            'skills' => $user->skills()->exists(),
-        ])->filter(fn (mixed $value): bool => blank($value))->keys();
+        $missing = $this->workflow->missingProfileFields($user);
 
         if ($missing->isNotEmpty()) {
             throw ValidationException::withMessages([
@@ -35,15 +34,7 @@ class SubmitAuthorApplication
             ]);
         }
 
-        $application = AuthorApplication::query()->updateOrCreate(
-            ['user_id' => $user->getKey()],
-            [
-                'status' => AuthorApplicationStatus::Pending,
-                'reviewed_by' => null,
-                'reviewed_at' => null,
-                'review_notes' => null,
-            ],
-        );
+        $application = $this->applications->submit($user);
 
         AuthorApplicationSubmitted::dispatch($application);
 

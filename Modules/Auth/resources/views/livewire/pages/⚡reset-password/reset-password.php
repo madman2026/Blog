@@ -1,12 +1,8 @@
 <?php
 
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
-use Illuminate\Validation\ValidationException;
 use Livewire\Component;
-use Modules\User\Models\User;
+use Modules\Auth\Actions\CompletePasswordReset;
 
 new class extends Component
 {
@@ -24,7 +20,7 @@ new class extends Component
         $this->email = (string) request()->query('email');
     }
 
-    public function resetPassword(): void
+    public function resetPassword(CompletePasswordReset $completePasswordReset): void
     {
         $validated = $this->validate([
             'token' => ['required', 'string'],
@@ -32,18 +28,7 @@ new class extends Component
             'password' => ['required', 'confirmed', PasswordRule::defaults()],
         ]);
 
-        $status = Password::reset($validated, function (User $user, string $password): void {
-            $user->forceFill([
-                'password' => $password,
-                'remember_token' => Str::random(60),
-            ])->save();
-            $user->tokens()->delete();
-            event(new PasswordReset($user));
-        });
-
-        if ($status !== Password::PasswordReset) {
-            throw ValidationException::withMessages(['email' => __($status)]);
-        }
+        $completePasswordReset->handle($validated);
 
         $this->redirectRoute('auth.login', navigate: true);
     }
