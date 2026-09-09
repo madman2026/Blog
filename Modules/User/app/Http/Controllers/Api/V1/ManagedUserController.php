@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\ValidationException;
+use Modules\User\Actions\UpdateManagedUserRole;
+use Modules\User\Actions\UpdateManagedUserStatus;
 use Modules\User\Enums\UserPermission;
 use Modules\User\Enums\UserRole;
 use Modules\User\Enums\UserStatus;
@@ -49,40 +50,16 @@ class ManagedUserController extends Controller
         return new UserResource($managedUser->load(['skills', 'media', 'roles']));
     }
 
-    public function updateStatus(UpdateUserStatusRequest $request, User $managedUser): UserResource
+    public function updateStatus(UpdateUserStatusRequest $request, User $managedUser, UpdateManagedUserStatus $updateStatus): UserResource
     {
-        if ($request->user()->is($managedUser)) {
-            throw ValidationException::withMessages([
-                'status' => __('You cannot change the status of your own account.'),
-            ]);
-        }
-
-        if ($managedUser->hasRole(UserRole::SuperUser->value)) {
-            throw ValidationException::withMessages([
-                'status' => __('A super-user account cannot be suspended.'),
-            ]);
-        }
-
-        $managedUser->update([
-            'status' => UserStatus::from($request->validated('status')),
-        ]);
-
-        if ($managedUser->status === UserStatus::Suspended) {
-            $managedUser->tokens()->delete();
-        }
+        $updateStatus->handle($managedUser, $request->user(), UserStatus::from($request->validated('status')));
 
         return new UserResource($managedUser->load(['skills', 'media', 'roles']));
     }
 
-    public function updateRole(UpdateUserRolesRequest $request, User $managedUser): UserResource
+    public function updateRole(UpdateUserRolesRequest $request, User $managedUser, UpdateManagedUserRole $updateRole): UserResource
     {
-        if ($request->user()->is($managedUser)) {
-            throw ValidationException::withMessages([
-                'role' => __('You cannot change your own role.'),
-            ]);
-        }
-
-        $managedUser->syncRoles([UserRole::from($request->validated('role'))->value]);
+        $updateRole->handle($managedUser, $request->user(), UserRole::from($request->validated('role')));
 
         return new UserResource($managedUser->load(['skills', 'media', 'roles']));
     }
