@@ -8,6 +8,7 @@
     "nightwatch": false,
     "packages": [
         "livewire/blaze",
+        "spatie/laravel-medialibrary",
         "spatie/laravel-permission"
     ],
     "sail": false,
@@ -22,7 +23,12 @@
         "echo-development",
         "tailwindcss-development",
         "blaze-optimize",
+        "medialibrary-development",
         "laravel-permission-development",
-        "laravel-attributes"
+        "ddd",
+        "laravel-attributes",
+        "modular-design-principles",
+        "php-best-practices",
+        "ux-designer"
     ]
 }
