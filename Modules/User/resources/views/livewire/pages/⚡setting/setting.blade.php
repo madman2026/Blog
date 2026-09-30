@@ -1,3 +1,3 @@
 <div>
-    <h3>The <code>user::pages.setting</code> mfc component is loaded from the <code>User</code> module.</h3>
+    <h3>{{ __('Component :component is loaded from the :module module.', ['component' => 'user::pages.setting', 'module' => 'User']) }}</h3>
 </div>

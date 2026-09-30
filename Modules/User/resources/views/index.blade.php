@@ -1,5 +1,5 @@
 <x-user::layouts.master>
-    <h1>Hello World</h1>
+    <h1>{{ __('User module') }}</h1>
 
-    <p>Module: {!! config('user.name') !!}</p>
+    <p>{{ __('Module: :module', ['module' => config('user.name')]) }}</p>
 </x-user::layouts.master>

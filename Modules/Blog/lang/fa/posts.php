@@ -1,34 +1,29 @@
 <?php
 
 return [
-
     'navigation' => [
-        'home' => 'Home',
-        'dashboard' => 'Dashboard',
-        'notifications' => 'Notifications',
-        'documents' => 'Documents',
-        'calendar' => 'Calendar',
-        'projects' => 'Projects',
+        'home' => 'خانه',
+        'dashboard' => 'داشبورد',
+        'notifications' => 'اعلان‌ها',
+        'documents' => 'اسناد',
+        'calendar' => 'تقویم',
+        'projects' => 'پروژه‌ها',
     ],
-
     'management' => [
-        'title' => 'Management',
-        'users' => 'Users',
-        'roles' => 'Roles',
-        'permissions' => 'Permissions',
+        'title' => 'مدیریت',
+        'users' => 'کاربران',
+        'roles' => 'نقش‌ها',
+        'permissions' => 'دسترسی‌ها',
     ],
-
     'actions' => [
-        'search' => 'Search',
-        'settings' => 'Settings',
-        'help' => 'Help',
+        'search' => 'جست‌وجو',
+        'settings' => 'تنظیمات',
+        'help' => 'راهنما',
     ],
-
     'profile' => [
-        'profile' => 'Profile',
-        'settings' => 'Account settings',
-        'notifications' => 'Notifications',
-        'admin_panel' => 'Admin panel',
+        'profile' => 'پروفایل',
+        'settings' => 'تنظیمات حساب',
+        'notifications' => 'اعلان‌ها',
+        'admin_panel' => 'پنل مدیریت',
     ],
-
 ];

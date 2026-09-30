@@ -166,7 +166,7 @@
             dark:text-zinc-950
         "
 >
-    رفتن به محتوای اصلی
+    {{ __('Skip to main content') }}
 </a>
 
 

@@ -9,5 +9,5 @@ new class extends Component
 ?>
 
 <div>
-    <h3>The <code>core::help.create</code> sfc component is loaded from the <code>Core</code> module.</h3>
+    <h3>{{ __('Component :component is loaded from the :module module.', ['component' => 'core::help.create', 'module' => 'Core']) }}</h3>
 </div>

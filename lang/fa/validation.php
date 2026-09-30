@@ -95,8 +95,8 @@ return [
         'string' => ':Attribute نباید بیشتر از :max کاراکتر داشته باشد.',
     ],
     'max_digits' => ':Attribute نباید بیشتر از :max رقم باشد.',
-    'mimes' => 'فرمت‌های معتبر فایل عبارتند از: :values.',
-    'mimetypes' => 'فرمت‌های معتبر فایل عبارتند از: :values.',
+    'mimes' => 'فرمت‌های معتبر فایل :attribute عبارتند از: :values.',
+    'mimetypes' => 'فرمت‌های معتبر فایل :attribute عبارتند از: :values.',
     'min' => [
         'array' => ':Attribute نباید کمتر از :min آیتم داشته باشد.',
         'file' => ':Attribute نباید کوچکتر از :min کیلوبایت باشد.',

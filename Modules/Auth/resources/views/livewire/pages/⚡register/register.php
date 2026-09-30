@@ -22,6 +22,6 @@ new class extends Component
 
     public function render(): Illuminate\Contracts\View\View|Factory|View
     {
-        return view('auth::livewire.pages.⚡register.register')->title(__('auth::register_title'));
+        return view('auth::livewire.pages.⚡register.register')->title(__('auth::register.title'));
     }
 };

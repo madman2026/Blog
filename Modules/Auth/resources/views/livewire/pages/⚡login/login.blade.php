@@ -117,7 +117,7 @@
                     autocapitalize="none"
                     spellcheck="false"
 
-                    placeholder="name@example.com / +98912..."
+                    placeholder="{{ __('Email or phone example') }}"
 
                     icon="envelope"
                 />

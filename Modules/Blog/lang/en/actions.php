@@ -1,41 +1,12 @@
 <?php
 
 return [
-
-    'dashboard' => 'Dashboard',
-
-    'search' => 'Search',
-
-    'notifications' => 'Notifications',
-
-    'documents' => 'Documents',
-
-    'calendar' => 'Calendar',
-
-    'projects' => 'Projects',
-
-    'profile' => 'Profile',
-
-    'settings' => 'Settings',
-
-    'help' => 'Help',
-
-    'management' => [
-
-        'title' => 'Management',
-
-        'users' => 'Users',
-
-        'roles' => 'Roles',
-
-        'permissions' => 'Permissions',
-
-    ],
-
-    'actions' => [
-
-        'close' => 'Close menu',
-
-    ],
-
+    'create' => 'Create post',
+    'edit' => 'Edit',
+    'delete' => 'Delete',
+    'save' => 'Save',
+    'save_draft' => 'Save draft',
+    'publish' => 'Publish',
+    'unpublish' => 'Unpublish',
+    'preview' => 'Preview',
 ];

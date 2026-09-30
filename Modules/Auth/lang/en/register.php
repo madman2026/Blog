@@ -3,15 +3,15 @@
 return [
     'title' => 'Create an account',
 
-    'description' => 'For Continue , Import Your Account Information.',
+    'description' => 'Enter your account information to continue.',
 
-    'submit' => 'Create Account',
+    'submit' => 'Create account',
 
-    'loading' => 'Creating Account , Please Wait...',
+    'loading' => 'Creating account, please wait...',
 
-    'have_account' => 'Have an account ?',
+    'have_account' => 'Already have an account?',
 
-    'login' => 'Login',
+    'login' => 'Sign in',
 
     'action' => 'Register',
 ];

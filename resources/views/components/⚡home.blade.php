@@ -68,7 +68,7 @@ new class extends Component
                         @endif
                     </div>
                     <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent p-6 pt-24 text-white">
-                        <span class="text-xs font-bold uppercase tracking-[.16em] text-cyan-300">{{ $featured->type->value }}</span>
+                        <span class="text-xs font-bold uppercase tracking-[.16em] text-cyan-300">{{ __($featured->type->value) }}</span>
                         <h2 class="mt-2 text-2xl font-black leading-snug">{{ $translation?->title }}</h2>
                         <p class="mt-3 line-clamp-2 text-sm leading-6 text-slate-300">{{ $translation?->summary }}</p>
                     </div>
@@ -97,7 +97,7 @@ new class extends Component
                     </a>
                     <div class="p-5">
                         <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                            <span class="font-bold uppercase text-cyan-700 dark:text-cyan-300">{{ $post->type->value }}</span>
+                            <span class="font-bold uppercase text-cyan-700 dark:text-cyan-300">{{ __($post->type->value) }}</span>
                             <time>{{ $post->published_at?->diffForHumans() }}</time>
                         </div>
                         <h3 class="mt-3 text-lg font-extrabold leading-7 text-slate-950 dark:text-white">

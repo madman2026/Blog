@@ -9,5 +9,5 @@ new class extends Component
 ?>
 
 <div>
-    <h3>The <code>interaction::comment-create</code> sfc component is loaded from the <code>Interaction</code> module.</h3>
+    <h3>{{ __('Component :component is loaded from the :module module.', ['component' => 'interaction::comment-create', 'module' => 'Interaction']) }}</h3>
 </div>
